@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState } from 'react';
 import { Text, View , StyleSheet, Button, TouchableWithoutFeedback } from 'react-native';
 // import { MyCalendar } from '../components/MyCalendar.tsx';
 // import  { Calendar ,CalendarProvider } from 'react-native-calendars';
@@ -16,6 +16,7 @@ import {
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DropDownPicker from 'react-native-dropdown-picker';
+import { Calendar } from 'react-native-calendars';
 
 
 const SchedulerScreen = () => {
@@ -28,6 +29,75 @@ const SchedulerScreen = () => {
     const [date, setDate] = useState(new Date());
     const [time, setTime] = useState(new Date());
     const [open, setOpen] = useState(false);
+    const [selectedDate, setSelectedDate] = useState('2024-05-01');
+    const [markedDates, setMarkedDates] = useState({});
+    const [dayDate, setDayDate] = useState<any>(null);
+    const [dateData, setDateData] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [dayDate, setDayDate] = useState<any>(null);
+
+    useEffect(() => {
+        const fetchAvailability = async () => {
+            try {
+                const response = await fetch('http://10.0.2.2:4000/api/getavailability', {
+                    method: 'POST',
+                    headers: {
+                        'Accept':'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ monthOp }),
+                }).then((res) => res.json())
+                .then((json) => {
+                    const data = json.data;
+                    // setListData(data);
+                    return data;
+                })
+                .catch((err) => {
+                    console.log('Error   ',err);
+                });
+
+                const dates = response.map(item => item.Date);
+                // Create an object with the dates as keys and marking them
+                if(dates){
+                    const marked = {};
+                    dates.forEach(date => {
+                        marked[date] = { marked: true, dotColor: 'blue' };
+                    });
+                    setMarkedDates(marked);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        fetchAvailability();
+    };
+
+    const fetchAvailabilityByDate = async (dayDate) => {
+        try {
+            await fetch('http://10.0.2.2:4000/api/getavailabilitybydate', {
+                method: 'POST',
+                headers: {
+                    'Accept':'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ dayDate }),
+            }).then((res) => res.json())
+            .then((json) => {
+                const data = json.data;
+                if(data !== undefined){
+                    setDateData(data);
+                    return data;
+                }else {
+                    Alert.alert('No records were found for this date. ');
+                }
+            })
+            .catch((err) => {
+                console.log('Error   ',err);
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const onChange = (event, selDate) => {
         const currentDate = selDate;
@@ -158,6 +228,21 @@ const SchedulerScreen = () => {
 
     ]);
 
+    const onDayPress = async(day) => {
+        try {
+            setDayDate(day.dateString);
+            setDateData([]);
+
+            if (loading) {
+                return <ActivityIndicator size="large" color="#0000ff" style={styles.loader} />;
+            }
+
+            fetchAvailabilityByDate(day.dateString);
+        } catch (error) {
+            console.log('ERROR    \n',error);
+        }
+    };
+
     return (
         <ImageBackground source={require('../components/img/app_admim_portal_bch.gif')}
         style={styles.background}>
@@ -199,6 +284,16 @@ const SchedulerScreen = () => {
                 /> */}
                 {/* {descError ? <Text style={styles.error}>{descError}</Text> : null} */}
 
+            </View>
+
+            <View style={styles.calSection}>
+                <Calendar
+                    current={selectedDate}
+                    key={selectedDate}
+                    markedDates={markedDates}
+                    markingType={'dot'}
+                    onDayPress={onDayPress}
+                />
             </View>
 
             <Text style={styles.pageComm}>Select a date amd time for your meeting.</Text>
