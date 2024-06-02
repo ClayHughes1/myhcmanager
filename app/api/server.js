@@ -143,7 +143,7 @@ app.post('/api/updateclientdetail', async (req, res) => {
                     if (result > 0) {
                         console.log('REESULLTS    \n'+JSON.stringify(result));
 
-                        res.status(200).json({ success: true, message: 'Client updated successfully'});
+                        res.status(200).json({ success: true, message: 'Client updated successfully',});
                     } else {
                         res.status(401).json({ success: false, message: 'Something happened the client was not created. ' });
                     }
