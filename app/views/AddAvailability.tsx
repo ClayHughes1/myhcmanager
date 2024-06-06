@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
     StyleSheet,
     Text,
@@ -12,9 +12,6 @@ import {
     TextInput,
     ActivityIndicator,
 } from 'react-native';
-// import { useNavigation } from '@react-navigation/native';
-// import {ParamListBase, useNavigation} from '@react-navigation/native';
-// import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Calendar } from 'react-native-calendars';
 import DropDownPicker from 'react-native-dropdown-picker';
 
@@ -26,7 +23,6 @@ const AddAvailability = () => {
     const [open, setOpen] = useState(false);
     const [markedDates, setMarkedDates] = useState({});
     const [dateData, setDateData] = useState([]);
-    const [listData, setListData] = useState([]);
     const [selectedDate, setSelectedDate] = useState('2024-05-01');
     const [isVisible, setIsVisible] = useState(false);
     const [addDate, setAddDate] = useState('');
@@ -41,7 +37,7 @@ const AddAvailability = () => {
         try {
             if(monthOp > 0)
             {
-                const response = await fetch('http://10.0.2.2:4000/api/getavailability', {
+                const response = await fetch('http://10.0.2.2:4000/api/getavailabilitybymonth', {
                     method: 'POST',
                     headers: {
                         'Accept':'application/json',
@@ -51,11 +47,10 @@ const AddAvailability = () => {
                 }).then((res) => res.json())
                 .then((json) => {
                     const data = json.data;
-                    // setListData(data);
                     return data;
                 })
                 .catch((err) => {
-                    console.log('Error   ',err);
+                    console.error('Error   ',err);
                 });
 
                 const dates = response.map(item => item.Date);
@@ -93,7 +88,7 @@ const AddAvailability = () => {
                 }
             })
             .catch((err) => {
-                console.log('Error   ',err);
+                console.error('Error   ',err);
             });
         } catch (error) {
             console.error(error);
@@ -114,7 +109,6 @@ const AddAvailability = () => {
                 })
                 .then((res) => res.json())
                 .then((json) => {
-                    // const data = json.Id;
                     if(json.Id)
                     {
                         setDateData([]);
@@ -122,7 +116,7 @@ const AddAvailability = () => {
                     }
                 })
                 .catch((err) => {
-                    console.log('Error   ',err);
+                    console.error('Error   ',err);
                 });
             }
         } catch (error) {
@@ -142,7 +136,6 @@ const AddAvailability = () => {
             })
             .then((res) => res.json())
             .then((json) => {
-                // const data = json.Id;
                 if(json.Id)
                 {
                     setDateData([]);
@@ -154,7 +147,7 @@ const AddAvailability = () => {
                 }
             })
             .catch((err) => {
-                console.log('Error   ',err);
+                console.error('Error   ',err);
             });
         } catch (error) {
             console.error(error);
@@ -191,7 +184,7 @@ const AddAvailability = () => {
 
             fetchAvailabilityByDate(day.dateString);
         } catch (error) {
-            console.log('ERROR    \n',error);
+            console.error('ERROR    \n',error);
         }
     };
 
@@ -216,7 +209,7 @@ const AddAvailability = () => {
             return standardTime;
 
         } catch (error) {
-            console.log('An error occurred  ',error);
+            console.error('An error occurred  ',error);
         }
     };
 
@@ -224,7 +217,7 @@ const AddAvailability = () => {
         try {
             setDateData([]);
         } catch (error) {
-            console.log('An error occurred  ',error);
+            console.error('An error occurred  ',error);
         }
     };
 
@@ -232,11 +225,11 @@ const AddAvailability = () => {
         try {
             removeDateOps(dateId);
         } catch (error) {
-            console.log('An error occurred  ',error);
+            console.error('An error occurred  ',error);
         }
     };
 
-    const addDateTIme = () => {
+    const addDateTime = () => {
         try {
             if(addDate === '')
             {
@@ -247,15 +240,13 @@ const AddAvailability = () => {
                 setIsVisible(!isVisible);
             }
         } catch (error) {
-            console.log('An error occurred  ',error);
+            console.error('An error occurred  ',error);
         }
     };
 
     const commitNewAvailabiity = () => {
         try {
             if (validateTime(hours, minutes)) {
-                console.log('Date to Add:', addDate);
-                console.log('Entered Time:', `${hours}:${minutes}`);
                 // Adjust hours based on the modifier
                 let hour = parseInt(hours, 10);
                 let isAmInt = parseInt(isAm, 10);
@@ -276,7 +267,7 @@ const AddAvailability = () => {
                 Alert.alert('Invalid Time', 'Please enter a valid time.');
             }
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
     };
 
@@ -295,7 +286,7 @@ const AddAvailability = () => {
             }
             return true;
         } catch (error) {
-            console.log('An error occurred  ',error);
+            console.error('An error occurred  ',error);
         }
     };
 
@@ -330,7 +321,7 @@ const AddAvailability = () => {
                 setIsDisabled(false);
             }
         } catch (error) {
-            console.log('An error occurred  ',error);
+            console.error('An error occurred  ',error);
         }
     };
 
@@ -428,7 +419,7 @@ const AddAvailability = () => {
                     </View>
                 )}
 
-                <Button onPress={addDateTIme} title="Add Date/Time" />
+                <Button onPress={addDateTime} title="Add Date/Time" />
                 <Button onPress={clearList} title="Clear List" />
             </SafeAreaView>
         </ImageBackground>

@@ -7,13 +7,13 @@ import {
     TouchableOpacity,
     ImageBackground,
 } from 'react-native';
-// import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 // import {ParamListBase, useNavigation} from '@react-navigation/native';
-// import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 //https://github.com/ClayHughes1/myhcmanager.git
 const AdminPortalScreen = () => {
-    // const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+    const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 
     return(
         <ImageBackground source={require('../components/img/app_admim_portal_bch.gif')}

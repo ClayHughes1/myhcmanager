@@ -17,6 +17,7 @@ import AddClient from './app/views/AddClient.tsx';
 import ClientDetail from './app/views/ClientDetail.tsx';
 import ViewAppointments from './app/views/ViewAppointments.tsx';
 import AddAvailability from './app/views/AddAvailability.tsx';
+import AppointmentScreen from './app/views/Appointment.tsx';
 
 const Stack = createNativeStackNavigator();
 
@@ -25,14 +26,14 @@ function App(): React.JSX.Element {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
-              name="Home"
-              component={HomeScreen}
-              options={{title: 'Home',headerShown: false}}
+            name="Home"
+            component={HomeScreen}
+            options={{title: 'Home',headerShown: false}}
         />
         <Stack.Screen
-              name="MeetingScheduler"
-              component={SchedulerScreen}
-              options={{title: 'Scheduler'}}
+            name="MeetingScheduler"
+            component={SchedulerScreen}
+            options={{title: 'Scheduler'}}
         />
         <Stack.Screen
             name="Register"
@@ -40,9 +41,9 @@ function App(): React.JSX.Element {
             options={{title: 'Register'}}
         />
         <Stack.Screen
-              name="Login"
-              component={Login}
-              options={{title: 'Login'}}
+            name="Login"
+            component={Login}
+            options={{title: 'Login'}}
         />
         <Stack.Screen
             name="Admin"
@@ -73,6 +74,11 @@ function App(): React.JSX.Element {
             name="AddAvailability"
             component={AddAvailability}
             options={{title: 'Add Availability'}}
+        />
+        <Stack.Screen
+            name="Appointment"
+            component={AppointmentScreen}
+            options={{title: 'Add Appointment'}}
         />
       </Stack.Navigator>
     </NavigationContainer>

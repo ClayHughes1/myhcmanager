@@ -7,15 +7,8 @@ import {
     StyleSheet,
     Text,
     View,
-    // useWindowDimensions,
-    // FlatList,
-    // ScrollView,
-//     TextInput,
-     // TouchableHighlight,
     TouchableOpacity,
-    // ScrollViewBase,
     ImageBackground,
-// Alert,
 } from 'react-native';
 import {ParamListBase, useNavigation} from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';

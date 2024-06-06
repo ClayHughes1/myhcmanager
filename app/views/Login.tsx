@@ -19,106 +19,6 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setUserPassword] = useState('');
 
-    const cancelLogin = ()=>{
-        // Alert.alert('Login cancelled');
-        navigation.navigate('Home');
-    };
-
-    // const loginUser = async() =>{
-    //     // Alert.alert('loggin in user');
-
-    //     if ( !userName ){
-    //         Alert.alert('Please enter a username');
-    //     }
-    //     else if ( !password ){
-    //         Alert.alert('Please enter a password');
-    //     }
-    //     else {
-    //          const value =  await AsyncStorage.getItem('userLoggedIn').catch((err) => {
-    //             Alert.alert('Is user logged in');
-
-    //             console.log(err);
-    //          });
-    //          Alert.alert('value   \n${value}');
-
-    //          if(value !== null)
-    //          {
-    //             Alert.alert('value is not null');
-
-    //             navigation.navigate('AdminPortal');
-    //          }
-    //          else {
-    //             AsyncStorage.getItem(userName).then((res) =>{
-    //                 if(res !== null)
-    //                 {
-    //                     Alert.alert('user name is not null');
-
-    //                     if(res !== password) {
-    //                         Alert.alert('Password incorrect');
-    //                     }
-    //                     else {
-    //                         AsyncStorage.setItem('userLoggedIn',userName).then((_resp) => {
-    //                             // if(_resp !== null){
-    //                                 Alert.alert(`${userName} Logged in`);
-    //                                 navigation.navigate('Home');
-    //                             // }
-    //                         });
-    //                     }
-    //                 }
-    //             }).catch((err) => {
-    //                 console.log(err);
-    //             });
-    //         }
-    //         // Alert.alert('end of else ');
-
-    //     }
-    // };
-
-    // const loginUser = ()=>{
-    //     if ( !userEmail ){
-    //         Alert.alert('Please enter a username');
-    //     }
-    //     else if ( !userPassword ){
-    //         Alert.alert('Please enter a password');
-    //     }
-    //     else {
-    //         AsyncStorage.getItem('userLoggedIn', (err, result) => {
-    //             if(err) {
-    //                 console.log(err);
-    //             }
-    //             if (result !== 'none'){
-    //                 Alert.alert('Someone already logged on');
-    //                 navigation.navigate('Admin');
-    //             }
-    //             else{
-    //                 AsyncStorage.getItem(userEmail, (err, result) => {
-    //                     if(err) {
-    //                         console.log(err);
-    //                     }
-    //                     if(result !== null){
-    //                         if(result !== userPassword) {
-    //                             Alert.alert('Password incorrect')
-    //                         }
-    //                         else {
-    //                             AsyncStorage.setItem('userLoggedIn',userEmail, (err, result) => {
-    //                                 if(err) {
-    //                                     console.log(err);
-    //                                 }
-    //                                 Alert.alert(`${userEmail} Logged in`);
-    //                                 navigation.navigate('Home');
-    //                             });
-    //                         }
-    //                     }
-    //                     else{
-    //                         Alert.alert(`No account for ${userEmail}`);
-    //                     }
-    //                 });
-    //             }
-    //         });
-    //     }
-    // };
-
-
     const handleLogin = async () => {
         try {
             if (!email || !password) {
@@ -131,18 +31,25 @@ const Login = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ email, password }),
+            }).then((res) => res.json())
+            .then((json) => {
+                // const data =  json;
+                if (json.success) {
+                    navigation.navigate('Admin');
+                } else {
+                    Alert.alert('Login Failed', json.message);
+                }
+            }).catch((err) => {
+                console.error('Error   ',err);
             });
-
-            const data = await response.json();
-            if (data.success) {
-                navigation.navigate('Admin');
-            } else {
-                Alert.alert('Login Failed', data.message);
-            }
         } catch (error) {
             console.error(error);
             Alert.alert('Error', 'An error occurred while trying to log in');
         }
+    };
+
+    const cancelLogin = ()=>{
+        navigation.navigate('Home');
     };
 
     return (

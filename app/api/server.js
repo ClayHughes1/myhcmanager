@@ -15,7 +15,6 @@ app.get('/api/data', (req, res) => {
     try {
         dbOps.getClientProfile().then((result) => {
             if (result.length > 0) {
-                // console.log('SENDING RSULTS............   '+JSON.stringify(result));
                 res.status(200).json(result);
             } else {
                 res.status(401).json({ success: false, message: 'Invalid email or password' });
@@ -27,9 +26,6 @@ app.get('/api/data', (req, res) => {
         console.error('SQL error', err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
-
-    // console.log('getting data');
-    // res.json(data);
 });
 
 // Endpoint to validate login
@@ -60,14 +56,12 @@ app.post('/api/addclient', async (req, res) => {
         }
         else {
                 dbOps.insertClientDetail(email,firstName,lastName,startdate,enddate,hasOrder).then((result) => {
-                    console.log('REESULLTS    \n'+result);
                     if (result) {
                         res.status(200).json({ success: true, message: 'Client entered successfully'});
                     } else {
                         res.status(401).json({ success: false, message: 'Something happened the client was not created. ' });
                     }
                 }).catch((err) => {
-                    console.log('ERROR \n'+err);
                     console.error('Error', err);
                 });
             }
@@ -80,23 +74,46 @@ app.post('/api/addclient', async (req, res) => {
 app.post('/api/addclientmeetevent', async (req, res) => {
     const { userEmail, date, time, userDesc} = req.body;
     try {
-        console.log();
         if (!userEmail || !date || !time || !userDesc) {
             return res.status(400).json({ success: false, message: 'Missing required fields' });
         }
+        // else {
+        //         dbOps.insertClientMeetDate(userEmail, date, time, userDesc).then((result) => {
+        //             if (result > -1) {
+        //                 res.status(200).json({ success: true, message: 'Client event entered successfully', eventId: result});
+        //             } else {
+        //                 res.status(401).json({ success: false, message: 'Something happened the event was not created. ' });
+        //             }
+        //         }).catch((err) => {
+        //             console.error('Error', err);
+        //         });
+        //     }
+    } catch (err) {
+        console.error('SQL error', err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+app.post('/api/addclientmeeteventdate', async (req, res) => {
+    const { email, date, time, description, id} = req.body;
+    try {
+        if (!email || !date || !time || !description) {
+            return res.status(400).json({ success: false, message: 'Missing required fields' });
+        }
         else {
-                dbOps.insertClientMeetDate(userEmail, date, time, userDesc).then((result) => {
-                    console.log('REESULLTS    \n'+result);
-                    if (result > -1) {
-                        res.status(200).json({ success: true, message: 'Client event entered successfully', eventId: result});
-                    } else {
-                        res.status(401).json({ success: false, message: 'Something happened the event was not created. ' });
-                    }
-                }).catch((err) => {
-                    console.log('ERROR \n'+err);
-                    console.error('Error', err);
-                });
-            }
+            dbOps.insertClientMeetDateAdv(email, date, time, description, id).then((result) => {
+                if (result > 0) {
+                    res.status(200).json({ success: true, message: 'Appointment created successfully.', eventId: result});
+                }else if(result  == 0){
+                    res.status(200).json({ success: true, message: 'An appointment already exists for this email, date, and time.', eventId: result});
+                }
+                else {
+                    res.status(401).json({ success: false, message: 'Something happened the event was not created. ' });
+                }
+            }).catch((err) => {
+                console.error('Error', err);
+            });
+        }
     } catch (err) {
         console.error('SQL error', err);
         res.status(500).json({ success: false, message: 'Server error' });
@@ -105,20 +122,17 @@ app.post('/api/addclientmeetevent', async (req, res) => {
 
 app.post('/api/getclientdetail', async (req, res) => {
     const {ClientId} = req.body;
-    console.log('GETTING CLIENT DETAIL..........   \n'+ClientId);
     try {
         if (!ClientId ) {
             return res.status(400).json({ success: false, message: 'Client Id does not exist.' });
         }else {
             dbOps.getClientDetailById(ClientId).then((result) => {
-                // console.log('REESULLTS    \n'+JSON.stringify(result));
                 if (result) {
                     res.status(200).json(result);
                 } else {
                     res.status(401).json({ success: false, message: 'Something happened the client was not found. ' });
                 }
             }).catch((err) => {
-                console.log('ERROR \n'+err);
                 console.error('Error', err);
             });
         }
@@ -131,24 +145,18 @@ app.post('/api/getclientdetail', async (req, res) => {
 
 app.post('/api/updateclientdetail', async (req, res) => {
     const {ClientId, email, planStart, planEnd, hasOrder } = req.body;
-    console.log(ClientId, email, planStart, planEnd, hasOrder);
     try {
         if (!ClientId) {
-            console.log('STATUS 400');
             return res.status(400).json({ success: false, message: 'Missing required fields' });
         }
         else {
-            console.log('calling db ops function............   \n',ClientId);
                 dbOps.updateClientDetail(ClientId,email,planStart,planEnd,hasOrder).then((result) => {
                     if (result > 0) {
-                        console.log('REESULLTS    \n'+JSON.stringify(result));
-
                         res.status(200).json({ success: true, message: 'Client updated successfully',});
                     } else {
                         res.status(401).json({ success: false, message: 'Something happened the client was not created. ' });
                     }
                 }).catch((err) => {
-                    console.log('ERROR \n'+err);
                     console.error('Error', err);
                 });
             }
@@ -161,20 +169,17 @@ app.post('/api/updateclientdetail', async (req, res) => {
 
 app.post('/api/getscheduledata', async (req, res) => {
     const {monthOp} = req.body;
-    console.log('GETTING CLIENT DETAIL..........   \n'+monthOp);
     try {
         if (!monthOp ) {
             return res.status(400).json({ success: false, message: 'Plese selct a month in the future.' });
         }else {
             dbOps.getEventsByMonth(monthOp).then((result) => {
                 if (result) {
-                    console.log('REESULLTS    \n'+JSON.stringify(result));
                     res.status(200).json({data: result});
                 } else {
                     res.status(401).json({ success: false, message: 'Something happened the client was not found. ' });
                 }
             }).catch((err) => {
-                console.log('ERROR \n'+err);
                 console.error('Error', err);
             });
         }
@@ -185,7 +190,7 @@ app.post('/api/getscheduledata', async (req, res) => {
 
 });
 
-app.post('/api/getavailability', async (req, res) => {
+app.post('/api/getavailabilitybymonth', async (req, res) => {
     const {monthOp} = req.body;
     try {
         if (!monthOp ) {
@@ -198,7 +203,6 @@ app.post('/api/getavailability', async (req, res) => {
                     res.status(401).json({ success: false, message: 'Something happened the client was not found. ' });
                 }
             }).catch((err) => {
-                console.log('ERROR \n'+err);
                 console.error('Error', err);
             });
         }
@@ -208,22 +212,64 @@ app.post('/api/getavailability', async (req, res) => {
     }
 });
 
+app.post('/api/getavailability', async (req, res) => {
+    try {
+
+        dbOps.getAvailability().then((result) => {
+            if (result) {
+                res.status(200).json({data: result});
+            } else {
+                res.status(401).json({ success: false, message: 'Something happened the client was not found. ' });
+            }
+        }).catch((err) => {
+            console.error('Error', err);
+        });
+    } catch (error) {
+        console.error('SQL error', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
 app.post('/api/getavailabilitybydate', async (req, res) => {
     const {dayDate} = req.body;
-    console.log('by date.........  \n',dayDate);
     try {
         if (!dayDate ) {
             return res.status(400).json({ success: false, message: 'Plese selct a date in the future.' });
         }else {
             dbOps.getAvailabilityByDate(dayDate).then((result) => {
                 if (result) {
-                    console.log(JSON.stringify(result));
                     res.status(200).json({data: result});
                 } else {
                     res.status(401).json({ success: false, message: 'Something happened the client was not found. ' });
                 }
             }).catch((err) => {
-                console.log('ERROR \n'+err);
+                console.error('Error', err);
+            });
+        }
+    } catch (error) {
+        console.error('SQL error', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+app.post('/api/isvalidclientemail', async (req, res) => {
+    try {
+        const {userEmail} = req.body;
+
+        if (userEmail === undefined ) {
+            return res.status(400).json({ success: false, message: 'Client email is required. Please enter the client email.' });
+        }
+        else if(!isValidEmail(userEmail)){
+            return res.status(400).json({ success: false, message: 'This is not a valid email format. Pleas enter a valid email.' });
+        }
+        else {
+            dbOps.isValidClientEmail(userEmail).then((result) => {
+                if (result > 0) {
+                    res.status(200).json({success: true, message: 'Email found. Select Next to continue to the next step. ', data: result});
+                } else {
+                    res.status(401).json({ success: false, message: 'Something happened the client was not found. Check the email and try again.' });
+                }
+            }).catch((err) => {
                 console.error('Error', err);
             });
         }
@@ -246,7 +292,6 @@ app.post('/api/deleteavailability', async (req, res) => {
                     res.status(401).json({ success: false, message: 'Something happened the date was not removed. ' });
                 }
             }).catch((err) => {
-                console.log('ERROR \n'+err);
                 console.error('Error', err);
             });
         }
@@ -269,7 +314,6 @@ app.post('/api/deletemeeting', async (req, res) => {
                     res.status(401).json({ success: false, message: 'Something happened the date was not removed. ' });
                 }
             }).catch((err) => {
-                console.log('ERROR \n'+err);
                 console.error('Error', err);
             });
         }
@@ -282,7 +326,6 @@ app.post('/api/deletemeeting', async (req, res) => {
 app.post('/api/addavailability', async (req, res) => {
     const {date, time} = req.body;
     try {
-        console.log('INSERTING NEW AVAILABILITY   '+ date +'   '+ time);
         if (!date && !time) {
             return res.status(400).json({ success: false, message: 'Unable to remove that date.' });
         }else {
@@ -293,7 +336,6 @@ app.post('/api/addavailability', async (req, res) => {
                     res.status(401).json({ success: false, message: 'Something happened the date was not removed. ' });
                 }
             }).catch((err) => {
-                console.log('ERROR \n'+err);
                 console.error('Error', err);
             });
         }
@@ -302,6 +344,27 @@ app.post('/api/addavailability', async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
+
+const isValidEmail = async(email) => {
+    var emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
+    if(email.length>254)
+        return false;
+
+    var valid = emailRegex.test(email);
+    if(!valid)
+        return false;
+
+    // Further checking of some things regex can't handle
+    var parts = email.split("@");
+    if(parts[0].length>64)
+        return false;
+
+    var domainParts = parts[1].split(".");
+    if(domainParts.some(function(part) { return part.length>63; }))
+        return false;
+
+    return true;
+}
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);

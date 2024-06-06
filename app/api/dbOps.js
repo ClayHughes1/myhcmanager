@@ -80,7 +80,6 @@ const getAvailabilityByDate = async (date) => {
   await adminPool.connect();
   // Connect to the database
   let request = await adminPool.request();
-  console.log("month value",date);
   try {
     request.input('date', sql.VarChar, date);
 
@@ -234,6 +233,28 @@ const insertClientMeetDate = async (email,date,time, description) => {
 
 }
 
+const insertClientMeetDateAdv = async (email,date,time, description,id) => {
+  await adminPool.connect();
+  // Connect to the database
+  let request = await adminPool.request();
+  try {
+    request.input('email', sql.VarChar, email);
+    request.input('meetdate', sql.VarChar, date);
+    request.input('meettime', sql.VarChar, time);
+    request.input('description', sql.VarChar, description);
+    request.input('Id', sql.Int, id);
+
+    const result = await request.execute('uspInsertClientMeetDate');
+    if(result.recordset.length > 0)
+    {
+      return JSON.parse(result.recordsets[0][0].Id);
+    }
+  } catch (err) {
+      throw err;
+  }
+
+}
+
 const updateClientMeetDate = async (email,date,time) => {
   await adminPool.connect();
   // Connect to the database
@@ -330,6 +351,7 @@ const updateClientDetail = async (ClientId,email,start,end,hasOrder) => {
       throw err;
   }
 }
+
 const getClientDetailById = async(ClientId) => {
   await adminPool.connect();
   // Connect to the database
@@ -377,6 +399,23 @@ const getClientsWithNoOrder = async () => {
   }
 }
 
+const isValidClientEmail = async (userEmail) => {
+  await adminPool.connect();
+  // Connect to the database
+  let request = await adminPool.request();
+  try {
+      request.input('email', sql.VarChar, userEmail);
+
+      const result = await request.execute('uspIsValidClientEmail');
+      if(result.recordset.length > 0)
+      {
+        return result.recordset[0].ISVALID;
+      }
+  } catch (err) {
+      throw err;
+  }
+}
+
 
 module.exports = {
   confirmLogin,
@@ -395,7 +434,9 @@ module.exports = {
   getClientDetailById,
   getEventsByMonth,
   insertClientMeetDate,
+  insertClientMeetDateAdv,
   updateClientMeetDate,
   updatePlanDates,
   updateClientDetail,
+  isValidClientEmail,
 } 

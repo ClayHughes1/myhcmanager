@@ -4,21 +4,19 @@ import {
     Text,
     View,
     TextInput,
-    // TouchableHighlight,
     ImageBackground,
     Alert,
     Button,
     SafeAreaView,
-    // ScrollView,
-    // Platform ,
 } from 'react-native';
-// import {ParamListBase, useNavigation} from '@react-navigation/native';
-// import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import {ParamListBase, useNavigation} from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { isValid } from 'date-fns';
 
 const AddClient = () =>{
-    // const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+    const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
     const [email, setEmail] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -26,106 +24,135 @@ const AddClient = () =>{
     const [enddate, setEndDate] = useState(new Date());
     const [hasOrder, setHasOrder] = useState(null);
     const [open, setOpen] = useState(false);
-    // const [value, setValue] = useState(null);
-
-
-
-    // const [date, setDate] = useState(new Date());
+    const [isEnabled, setIsEnabled] = useState(true);
     const [show, setShow] = useState(false);
     const [displayStartDate, setStartDisplayDate] = useState('');
     const [displayEndDate, setEndDisplayDate] = useState('');
-
-
-    const [items, setItems] = useState([
-      {label: 'No', value: '0'},
-      {label: 'Yes', value: '1'},
-    ]);
-
-    // const [enddate, setEndDate] = useState('');
-
-    // const [password, setPassword] = useState('');
 
     const addClient = async() => {
         if(email === '' && firstName === '' && lastName === '')
         {
             Alert.alert('Email, First name, and Last name are required');
         }else {
-            console.log('email  ',email);
-            console.log('first  ',firstName);
-            console.log('last  ',lastName);
-
             try {
-                const response = await fetch('http://10.0.2.2:4000/api/addclient', {
+                await fetch('http://10.0.2.2:4000/api/addclient', {
                     method: 'POST',
                     headers: {
                         'Accept':'application/json',
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({ email, firstName,lastName, startdate, enddate, hasOrder }),
-                }).catch((err) => {
-                    console.log('Error   ',err);
+                }).then((res) => res.json())
+                .then((json) => {
+                    if (json.success === true) {
+                        Alert.alert(json.message);
+                        setIsEnabled(false);
+                        clearFields();
+                    } else {
+                        Alert.alert(json.message);
+                    }
+                })
+                .catch((err) => {
+                    console.error('Error   ',err);
                 });
-                console.log(response);
-                // const data = await response.json();
-
-                // if (data.success) {
-                //     Alert.alert('Login Successful', `Welcome ${data.user.name}`);
-                // } else {
-                //     Alert.alert('Login Failed', data.message);
-                // }
             } catch (error) {
-                console.error(error);
-                console.log(error);
-                Alert.alert('Error', 'An error occurred while trying to log in');
+                console.error('ERROR ',error);
             }
-
         }
     };
 
+    const [items, setItems] = useState([
+        {label: 'Select', value: '0'},
+        {label: 'No', value: '1'},
+        {label: 'Yes', value: '2'},
+    ]);
+
     const addMeetingDate = async() => {
-        console.log('redirecting to shcduler page  ');
-        // navigation.navigate('MeetingScheduler',{email, firstName, lastName,})
+        try {
+            navigation.navigate('MeetingScheduler',{email, firstName, lastName,})
+        } catch (error) {
+            console.error('ERROR ',error);
+        }
     };
 
     const showStartDatepicker = () => {
-        setShow(true);
+        try {
+            setShow(true);
+        } catch (error) {
+            console.error('ERROR ',error);
+        }
     };
 
     const showEndDatepicker = () => {
-        setShow(true);
+        try {
+            setShow(true);
+        } catch (error) {
+            console.error('ERROR ',error);
+        }
     };
 
     const onStartChange = (event, selectedDate) => {
-        const currentDate = selectedDate || startdate;
-        // setShow(Platform.OS === 'android');
-        // setShow(Platform.OS === 'ios');
-        // setStartDate(currentDate);
+        try {
+            const currentDate = selectedDate || startdate;
+            // setShow(Platform.OS === 'android');
+            // setShow(Platform.OS === 'ios');
+            // setStartDate(currentDate);
 
-        setShow(false);
-        setStartDate(currentDate);
+            setShow(false);
+            setStartDate(currentDate);
 
-        // setStartDate(selectedDate);
+            // setStartDate(selectedDate);
 
-        const formattedDate = currentDate.toLocaleDateString();
-        setStartDisplayDate(formattedDate);
+            const formattedDate = currentDate.toLocaleDateString();
+            setStartDisplayDate(formattedDate);
+
+        } catch (error) {
+            console.error('ERROR ',error);
+        }
     };
 
     const onEndChange = (event, selectedDate) => {
-        // const currentDate = selectedDate || enddate;
-        // setShow(Platform.OS === 'android');
-        setShow(false);
-        // setShow(Platform.OS === 'ios');
-        setEndDate(selectedDate);
+        try {
+                    // const currentDate = selectedDate || enddate;
+            // setShow(Platform.OS === 'android');
+            setShow(false);
+            // setShow(Platform.OS === 'ios');
+            setEndDate(selectedDate);
 
-        const formattedDate = selectedDate.toLocaleDateString();
-        setEndDisplayDate(formattedDate);
+            const formattedDate = selectedDate.toLocaleDateString();
+            setEndDisplayDate(formattedDate);
+        } catch (error) {
+            console.error('ERROR ',error);
+        }
     };
+
+    const handleChangeValue = (value) => {
+        try {
+            if(value > 0)
+            {
+                setHasOrder(value);
+            }
+            else {
+                Alert.alert('Please select a valid option. ');
+            }
+        } catch (error) {
+            console.error('An error occurred  ',error);
+        }
+    };
+
+const clearFields = () => {
+    setEmail('');
+    setFirstName('');
+    setLastName('');
+    setStartDate(new Date());
+    setEndDate(new Date());
+    setHasOrder(null);
+};
 
     return(
         <ImageBackground source={require('../components/img/app_admim_portal_bch.gif')}
         style={styles.background}>
             <SafeAreaView style={{height: 800}}>
-                {/* <ScrollView style={{height: 900}}> */}
                     <View style={styles.container}>
                         <Text style={styles.heading}>Add Client</Text>
 
@@ -156,10 +183,6 @@ const AddClient = () =>{
                                 />
                             )}
 
-
-                            {/* <Text style={styles.labels}>Start Date</Text>
-                            <TextInput style={styles.inputs} onChangeText={setStartDate} value={startdate} /> */}
-
                             <Text style={styles.labels}>End Date</Text>
                             <TextInput
                                 style={styles.inputs}
@@ -176,10 +199,6 @@ const AddClient = () =>{
                                 />
                             )}
 
-
-                            {/* <Text style={styles.labels}>End Date</Text>
-                            <TextInput style={styles.inputs} onChangeText={setEndDate} value={enddate} /> */}
-
                             <Text style={styles.labels}>Has Order</Text>
                             <DropDownPicker
                                 open={open}
@@ -189,27 +208,13 @@ const AddClient = () =>{
                                 setValue={setHasOrder}
                                 setItems={setItems}
                                 style={styles.inputs}
+                                onChangeValue={handleChangeValue}
                             />
 
-
-                            {/* <Text style={styles.labels}>Enter Password</Text>
-                            <TextInput style={styles.inputs} onChangeText={setPassword} value={password} secureTextEntry={true} /> */}
-
-
-                            <Button onPress={addClient} title="Add Client" />
+                            <Button onPress={addClient}  disabled={isEnabled} title="Add Client" />
                             <Button onPress={addMeetingDate} title="Add Meeting Date" />
-
-                            {/* <TouchableHighlight style={styles.touchStyle1} onPress={addClient} underlayColor="#000000">
-                                <Text style = {styles.buttons}>Add Client</Text>
-                            </TouchableHighlight>
-
-                            <TouchableHighlight style={styles.touchStyle1} onPress={addMeetingDate} underlayColor="#000000">
-                                <Text style = {styles.buttons}>Add Meeting Date</Text>
-                            </TouchableHighlight> */}
-
                         </View>
                     </View>
-                {/* </ScrollView> */}
             </SafeAreaView>
         </ImageBackground>
     );
