@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
     StyleSheet,
     Text,
@@ -11,68 +11,68 @@ import {
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 
-const ViewAppointments = () => {
-    const [meetings, setMeetings] = useState({});
-    let [monthOp, setMonthOp] = useState(null);
+const MyAppointments = ({route}) => {
+    const { email } = route.params;
+    const [appData, setAppData] = useState([]);
     const [open, setOpen] = useState(false);
-    // const [markedDates, setMarkedDates] = useState({});
-    const [dateData, setDateData] = useState([]);
-    const [selectedDate, setSelectedDate] = useState('2024-05-01');
+    let [monthOp, setMonthOp] = useState('');
+    const [filteredData, setFilteredData] = useState([]);
+    const [isFiltered, setIsFiltered] = useState(false);
 
-    const fetchMeetings = async () => {
-        try {
-            if(monthOp > 0)
-            {
-                // Alert.alert('Month criteria met.');
+    useEffect(() => {
+        const fetchMyAppts = async () => {
+            try {
+                if(email !== '' || email !== undefined)
+                {
+                    console.log(email);
 
-                const response = await fetch('http://10.0.2.2:4000/api/getscheduledata', {
-                    method: 'POST',
-                    headers: {
-                        'Accept':'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ monthOp }),
-                }).then((res) => res.json())
-                .then((json) => {
-                    const data = json.data;
-                    return data;
-                })
-                .catch((err) => {
-                    console.error('Error   ',err);
-                });
+                    // Alert.alert('Month criteria met.');
 
-                setDateData(response);
+                    await fetch('http://10.0.2.2:4000/api/getmyappts', {
+                        method: 'POST',
+                        headers: {
+                            'Accept':'application/json',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email }),
+                    }).then((res) => res.json())
+                    .then((json) => {
+                        // const data = json.data;
+                        setAppData(json.data);
+                        setFilteredData(json.data);
+                        // return data;
+                    })
+                    .catch((err) => {
+                        console.error('Error   ',err);
+                    });
+                }
+            } catch (error) {
+                console.error(error);
             }
-        } catch (error) {
-            console.error(error);
-        }
-    };
+        };
+        fetchMyAppts();
+    }, [email]);
 
-    const cancelMeetingOps = async (Id) => {
+    const  convertToStandardTime = (militaryTime) => {
         try {
-            if(Id > 0)
-            {
-                await fetch('http://10.0.2.2:4000/api/deletemeeting', {
-                    method: 'POST',
-                    headers: {
-                        'Accept':'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ Id }),
-                })
-                .then((res) => res.json())
-                .then((json) => {
-                    // const data = json.Id;
-                    if(json.Id)
-                    {
-                        setDateData([]);
-                        fetchMeetings();
-                    }
-                })
-                .catch((err) => {
-                    console.error('Error   ',err);
-                });
-            }
+            // Splitting the military time into hours and minutes
+            const [hours, minutes] = militaryTime.split(':');
+
+            // Converting hours to a number
+            let hour = parseInt(hours, 10);
+
+            // Determining AM or PM
+            const period = (hour < 12) ? 'AM' : 'PM';
+
+            // Converting from military time to standard time
+            hour = (hour > 12) ? hour - 12 : hour;
+            hour = (hour === 0) ? 12 : hour; // Handle midnight
+
+            // Formatting the result
+            const standardTime = `${hour}:${minutes} ${period}`;
+
+            return standardTime;
+
         } catch (error) {
             console.error(error);
         }
@@ -80,44 +80,26 @@ const ViewAppointments = () => {
 
     const handlChange = async () => {
         try {
-
-            if(monthOp < 10)
+            if(monthOp < 1)
             {
-                monthOp = '0' + monthOp;
-            }
+                setAppData(filteredData);
 
-            const currentYear = new Date().getFullYear();
-            const newDate = `${currentYear}-${monthOp}-01`;
-            setSelectedDate(newDate);
-            fetchMeetings();
+            } else {
+                if(monthOp < 10)
+                {
+                    monthOp = '0' + monthOp;
+                }
+                const filtered = filteredData.filter(item => item.MeetDate.split('-')[1] === monthOp);
+                if(filtered.length === 0)
+                {
+                    Alert.alert('No data found for the selected month. ');
+                }else {
+                    setAppData(filtered);
+                }
+            }
         } catch (error) {
             console.error(error);
             Alert.alert('Something has changed.' + error);
-        }
-    };
-
-    const  convertToStandardTime = (militaryTime) => {
-        try {
-                    // Splitting the military time into hours and minutes
-        const [hours, minutes] = militaryTime.split(':');
-
-        // Converting hours to a number
-        let hour = parseInt(hours, 10);
-
-        // Determining AM or PM
-        const period = (hour < 12) ? 'AM' : 'PM';
-
-        // Converting from military time to standard time
-        hour = (hour > 12) ? hour - 12 : hour;
-        hour = (hour === 0) ? 12 : hour; // Handle midnight
-
-        // Formatting the result
-        const standardTime = `${hour}:${minutes} ${period}`;
-
-        return standardTime;
-
-        } catch (error) {
-            console.error(error);
         }
     };
 
@@ -137,21 +119,12 @@ const ViewAppointments = () => {
         { label: 'December', value: '12' },
     ]);
 
-    const cancelMeeting = async(meetId) => {
-        try {
-            cancelMeetingOps(meetId);
-        } catch (error) {
-            console.error('An error occurred  ',error);
-        }
-    };
-
     return(
         <ImageBackground source={require('../components/img/app_admim_portal_bch.gif')}
         style={styles.background}>
             <SafeAreaView style={styles.container}>
-            <Text style={styles.heading}>View Appointments</Text>
-
-                <View style={styles.monthOp}>
+                <Text style={styles.heading}>My Appointments</Text>
+                <View>
                     <Text style={styles.labels}>Select month to view schedule</Text>
                         <DropDownPicker
                             open={open}
@@ -162,30 +135,28 @@ const ViewAppointments = () => {
                             setItems={setItems}
                             zIndex={3000}
                             zIndexInverse={1000}
-                            dropDownContainerStyle={{height:300}}
+                            // dropDownContainerStyle={{height:100}}
                             onChangeValue={handlChange}
                             listMode="SCROLLVIEW"
                             placeholder="Select your month"
-                        />
+                    />
+                </View> 
+
+
+                <View style={styles.monthOp}>
+
+                    <FlatList
+                        data={appData}
+                        renderItem={({ item }) => (
+                            <View style={styles.meetingItem}>
+                                <Text style={styles.detailText}>Date: {item.MeetDate}</Text>
+                                <Text style={styles.detailText}>Time: {convertToStandardTime(item.MeetTime)}</Text>
+                                <Text style={styles.detailText}>Description: {item.MeetDescription}</Text>
+                            </View>
+                        )}
+                        keyExtractor={(item, index) => index.toString()}
+                    />
                 </View>
-
-                <FlatList
-                    data={dateData}
-                    renderItem={({ item }) => (
-                    <View style={styles.meetingItem}>
-                        <Text style={styles.detailText}>Date: {item.MeetDate}</Text>
-                        <Text style={styles.detailText}>Time: {convertToStandardTime(item.MeetTime)}</Text>
-                        <Text style={styles.detailText}>Description: {item.MeetDescription}</Text>
-                        <Text style={styles.detailText}>First Name: {item.First}</Text>
-                        <Text style={styles.detailText}>Last Name: {item.Last}</Text>
-                        <TouchableOpacity style={styles.touchStyle2} onPress={() => cancelMeeting(item.Id)}>
-                            <Text style={styles.rmvButton}>Cancel</Text>
-                        </TouchableOpacity>
-                    </View>
-                    )}
-                    keyExtractor={(item, index) => index.toString()}
-                />
-
             </SafeAreaView>
         </ImageBackground>
     );
@@ -276,7 +247,7 @@ const styles = StyleSheet.create({
         resizeMode: 'cover', // or 'stretch' or 'contain'
     },
     monthOp: {
-        height:60,
+        height:800,
         marginBottom: 30,
         marginTop:20,
     },
@@ -315,4 +286,4 @@ const styles = StyleSheet.create({
         marginLeft: 20,
     },
 });
-export default ViewAppointments;
+export default MyAppointments;

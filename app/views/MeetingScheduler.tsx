@@ -123,7 +123,25 @@ const SchedulerScreen = () => {
 
     const addAppintment = () => {
         try {
-            navigation.navigate('Appointment',{email: userEmail});
+            if(userEmail !== ''){
+                navigation.navigate('Appointment',{email: userEmail});
+            }
+            else {
+                Alert.alert('Email is required. ');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const viewMyAppointments = () => {
+        try {
+            if(userEmail !== ''){
+                navigation.navigate('MyAppointments',{email: userEmail});
+            }
+            else {
+                Alert.alert('Email is required. ');
+            }
         } catch (error) {
             console.error(error);
         }
@@ -135,7 +153,7 @@ const SchedulerScreen = () => {
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <SafeAreaView style={styles.container}>
                     <View style={styles.container}>
-                        <Text style={styles.bigBlue}>Add Appointment</Text>
+                        <Text style={styles.bigBlue}>Appointment Portal</Text>
 
                         <View style={styles.inpView}>
                             <Text style={styles.labels}>Enter Email</Text>
@@ -150,9 +168,13 @@ const SchedulerScreen = () => {
                             {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
                         </View>
                     </View>
-                    <View>
-                        <TouchableOpacity style={styles.touchStyle2} onPress={() => addAppintment()}>
-                            <Text style={styles.rmvButton}>Next</Text>
+                    <View style={styles.row}>
+                        <TouchableOpacity style={styles.touchStyle} onPress={() => addAppintment()}>
+                            <Text style={styles.rmvButton}>Add</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={styles.touchStyle} onPress={() => viewMyAppointments()}>
+                            <Text style={styles.rmvButton}>View</Text>
                         </TouchableOpacity>
                     </View>
                 </SafeAreaView>
@@ -269,12 +291,13 @@ const styles = StyleSheet.create({
     },
     rmvButton:{
         height:45,
-        width: 100,
-        fontSize: 20,
-        backgroundColor: 'rgba(0, 0, 0, 0.15)',
+        width: 150,
+        fontSize: 28,
+        fontWeight:'600',
+        backgroundColor: 'rgba(0, 0, 0, 0.30)',
         textAlign: 'center',
-        padding:5,
-        marginTop: -30,
+        // padding:5,
+        // marginTop: -5,
         marginLeft: 10,
     },
     touchStyle2:{
@@ -286,6 +309,20 @@ const styles = StyleSheet.create({
         marginRight: 10,
         marginTop: -10,
         alignItems: 'flex-end',
+    },
+    touchStyle: {
+        backgroundColor: 'rgba(0, 0, 0, 0)',
+        //'#007BFF',
+        padding: 10,
+        borderRadius: 5,
+        marginHorizontal: 5, // Add some space between buttons
+        marginTop: -1000,
+
+    },
+    row: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
 });
 

@@ -345,16 +345,12 @@ const AppointmentScreen = ({route}) => {
                             />
                             <Button onPress={clearList} title="Clear List" />
                             <Button onPress={goHome} title="Done" />
-
-
-                            {/* <Button onPress={handleAddEvent} disabled={!isEnabled}  title="Add Event to Calendar" /> */}
-                            {/* disabled={isEnabled} */}
                     </View>
                     <View style={styles.calendarblock}>
-                                <TouchableOpacity style={styles.touchStyle2} onPress={() => handleAddEvent()} >
-                                    <Text style={styles.rmvButton}>Add Event to Calendar</Text>
-                                </TouchableOpacity>
-                            </View>
+                        <TouchableOpacity style={styles.touchStyle2} onPress={() => handleAddEvent()} >
+                            <Text style={styles.rmvButton}>Add Event to Calendar</Text>
+                        </TouchableOpacity>
+                    </View>
                 </SafeAreaView>
             </TouchableWithoutFeedback>
         </ImageBackground>

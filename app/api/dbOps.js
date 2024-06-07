@@ -151,6 +151,25 @@ const getEventsByMonth = async (month) => {
 
 }
 
+const getClientAppts = async (email) => {
+  await adminPool.connect();
+  // Connect to the database
+  let request = await adminPool.request();
+  try {
+    request.input('email', sql.VarChar, email);
+
+    const result = await request.execute('uspGetClientAppts');
+    if(result.recordset.length > 0)
+    {
+      return JSON.parse(result.recordsets[0][0].MyApptList);
+    }
+  } catch (err) {
+    console.log(err);
+      throw err;
+  }
+
+}
+
 const insertAvailability = async (date,time) => {
   await adminPool.connect();
   // Connect to the database
@@ -433,6 +452,7 @@ module.exports = {
   getClientsWithNoOrder,
   getClientDetailById,
   getEventsByMonth,
+  getClientAppts,
   insertClientMeetDate,
   insertClientMeetDateAdv,
   updateClientMeetDate,

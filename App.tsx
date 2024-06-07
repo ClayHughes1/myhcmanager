@@ -18,6 +18,7 @@ import ClientDetail from './app/views/ClientDetail.tsx';
 import ViewAppointments from './app/views/ViewAppointments.tsx';
 import AddAvailability from './app/views/AddAvailability.tsx';
 import AppointmentScreen from './app/views/Appointment.tsx';
+import MyAppointments from './app/views/MyAppointments.tsx';
 
 const Stack = createNativeStackNavigator();
 
@@ -79,6 +80,11 @@ function App(): React.JSX.Element {
             name="Appointment"
             component={AppointmentScreen}
             options={{title: 'Add Appointment'}}
+        />
+        <Stack.Screen
+            name="MyAppointments"
+            component={MyAppointments}
+            options={{title: 'My Appointment'}}
         />
       </Stack.Navigator>
     </NavigationContainer>

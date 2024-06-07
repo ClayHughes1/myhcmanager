@@ -9,6 +9,7 @@ import {
     View,
     TouchableOpacity,
     ImageBackground,
+    FlatList,
 } from 'react-native';
 import {ParamListBase, useNavigation} from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -60,33 +61,31 @@ const ClientResultsScreen = () => {
                         <Text style={styles.itemCell}>First</Text>
                         <Text style={styles.itemCell}>Last</Text>
                     </View>
-                    {/* <ScrollView style={styles.listScroll}> */}
                         <View style={styles.listParent}>
-                        {data.map((item) => (
-                            <TouchableOpacity key={item.Id}  onPress={() => getClientDetail(item)}>
-                                <View style={styles.item}>
-                                    <Text style={styles.itemEmailCell}>{item.Email}</Text>
-                                    <Text style={styles.itemCell}>{item.First}</Text>
-                                    <Text style={styles.itemCell}>{item.Last}</Text>
-                                </View>
-                            </TouchableOpacity>
-
-                        ))}
-
-                            {/* <FlatList
-                            style={styles.list}
-                                data={data}
-                                keyExtractor={(item) => item.Id.toString()}
-                                renderItem={({ item }) => (
+                            {/* {data.map((item) => (
+                                <TouchableOpacity key={item.Id}  onPress={() => getClientDetail(item)}>
                                     <View style={styles.item}>
                                         <Text style={styles.itemEmailCell}>{item.Email}</Text>
                                         <Text style={styles.itemCell}>{item.First}</Text>
                                         <Text style={styles.itemCell}>{item.Last}</Text>
                                     </View>
-                                )}
-                            /> */}
+                                </TouchableOpacity>
+
+                            ))} */}
+
+                            <FlatList
+                                style={styles.list}
+                                    data={data}
+                                    keyExtractor={(item) => item.Id.toString()}
+                                    renderItem={({ item }) => (
+                                        <View style={styles.meetingItem}>
+                                            <Text style={styles.itemEmailCell}>{item.Email}</Text>
+                                            <Text style={styles.itemCell}>{item.First}</Text>
+                                            <Text style={styles.itemCell}>{item.Last}</Text>
+                                        </View>
+                                    )}
+                            />
                         </View>
-                    {/* </ScrollView> */}
                     <TouchableOpacity style={styles.touchStyle1} onPress={() => navigation.navigate('AddClient')}>
                         <Text style={styles.buttons}>Add Client</Text>
                     </TouchableOpacity>
@@ -227,6 +226,12 @@ const styles = StyleSheet.create({
     background: {
         flex: 1,
         resizeMode: 'cover', // or 'stretch' or 'contain'
+    },
+    meetingItem: {
+        marginBottom: 10,
+        padding: 10,
+        backgroundColor: '#f0f0f0',
+        borderRadius: 5,
     },
 });
 export default ClientResultsScreen;

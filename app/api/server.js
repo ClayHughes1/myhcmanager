@@ -190,6 +190,30 @@ app.post('/api/getscheduledata', async (req, res) => {
 
 });
 
+app.post('/api/getmyappts', async (req, res) => {
+    const {email} = req.body;
+    try {
+        if (email === '' || email === undefined) {
+            return res.status(400).json({ success: false, message: 'Plese selct a month in the future.' });
+        }else {
+            dbOps.getClientAppts(email).then((result) => {
+                if (result) {
+                    res.status(200).json({success: true,message: 'Client data was found. ',data: result});
+                } else {
+                    res.status(401).json({ success: false, message: 'Something happened the client was not found. ' });
+                }
+            }).catch((err) => {
+                console.log('Error', err);
+            });
+        }
+    } catch (error) {
+        console.log('SQL error', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+
+});
+
+
 app.post('/api/getavailabilitybymonth', async (req, res) => {
     const {monthOp} = req.body;
     try {
