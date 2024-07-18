@@ -54,7 +54,7 @@ function App(): React.JSX.Element {
         <Stack.Screen
             name="Clients"
             component={ClientResults}
-            options={{title: 'Client Results'}}
+            options={{title: 'My Clients'}}
         />
         <Stack.Screen
             name="AddClient"

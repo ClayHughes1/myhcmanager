@@ -14,6 +14,9 @@ import {
 import {ParamListBase, useNavigation} from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
+// add notes for client support notes
+
+
 const ClientResultsScreen = () => {
     const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
     const [data, setData] = useState([]);
@@ -46,7 +49,6 @@ const ClientResultsScreen = () => {
 
     const getClientDetail = async(item) => {
         console.log('GETTING CLIENT DETAIL.....................',item.Id);
-        // setClientId(item.Id);
         navigation.navigate('ClientDetail',{ClientId: item.Id});
     };
 
@@ -54,13 +56,13 @@ const ClientResultsScreen = () => {
         <ImageBackground source={require('../components/img/app_admim_portal_bch.gif')}
         style={styles.background}>
             <View style={styles.container}>
-                <Text style={styles.heading}>Client List</Text>
+                <Text style={styles.heading}>My Client List</Text>
                 <SafeAreaView style={styles.container}>
-                    <View style={styles.tableHeader}>
+                    {/* <View style={styles.tableHeader}>
                         <Text style={styles.itemEmailCell}>Email</Text>
                         <Text style={styles.itemCell}>First</Text>
                         <Text style={styles.itemCell}>Last</Text>
-                    </View>
+                    </View> */}
                         <View style={styles.listParent}>
                             {/* {data.map((item) => (
                                 <TouchableOpacity key={item.Id}  onPress={() => getClientDetail(item)}>
@@ -79,9 +81,12 @@ const ClientResultsScreen = () => {
                                     keyExtractor={(item) => item.Id.toString()}
                                     renderItem={({ item }) => (
                                         <View style={styles.meetingItem}>
-                                            <Text style={styles.itemEmailCell}>{item.Email}</Text>
-                                            <Text style={styles.itemCell}>{item.First}</Text>
-                                            <Text style={styles.itemCell}>{item.Last}</Text>
+                                            <Text style={styles.detailText}>Email: {item.Email}</Text>
+                                            <Text style={styles.detailText}>First: {item.First}</Text>
+                                            <Text style={styles.detailText}>Last: {item.Last}</Text>
+                                            <TouchableOpacity style={styles.touchStyle2} onPress={() => getClientDetail(item)}>
+                                                <Text style={styles.listButton}>Details</Text>
+                                            </TouchableOpacity>
                                         </View>
                                     )}
                             />
@@ -216,7 +221,7 @@ const styles = StyleSheet.create({
 
     },
     listParent:{
-        height:400,
+        height:500,
         marginBottom: 100,
     },
     listScroll:{
@@ -232,6 +237,29 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: '#f0f0f0',
         borderRadius: 5,
+    },
+    listButton: {
+        height:40,
+        width: 100,
+        fontSize: 20,
+        backgroundColor: 'rgba(0, 0, 0, 0.15)',
+        textAlign: 'center',
+        padding:5,
+        marginTop: -10,
+        marginLeft: 20,
+    },
+    touchStyle2:{
+        backgroundColor: 'rgba(0, 0, 0, 0)',
+        width: '80%',
+        height: 25,
+        marginLeft: 40,
+        marginBottom: 10,
+        marginRight: 10,
+        marginTop: -10,
+        alignItems: 'flex-end',
+    },
+    detailText:{
+        fontSize: 22,
     },
 });
 export default ClientResultsScreen;
