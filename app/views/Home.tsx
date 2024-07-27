@@ -1,16 +1,11 @@
 import React from 'react';
-// import Video from 'react-native-video';
 import {
   StyleSheet,
   Text,
   View,
-  // TextInput,
-  // TouchableHighlight,
   TouchableOpacity,
   ImageBackground,
 } from 'react-native';
-// import CreateScreen from '../views/CreateScreen.tsx';
-// import { useNavigation } from '@react-navigation/native';
 import {ParamListBase, useNavigation} from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 

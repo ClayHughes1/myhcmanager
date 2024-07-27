@@ -14,58 +14,29 @@ import {
 import {ParamListBase, useNavigation} from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { format } from 'date-fns';
+import { RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import {ClientDetails} from '../../src/types/interfaces';
 
-const ClientDetail = ({route}) => {
+
+const ClientDetail = ({route }) => {
     const { ClientId } = route.params;
     const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
-    const [clientDetails, setClientDetails] = useState(null);
+    const [clientDetails, setClientDetails] = useState<ClientDetails[] | null>(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<Error | null>(null);
     const [isEditable, setIsEditable] = useState(false);
-    // const [firstName, setFirstName] = useState(clientDetails[0].First);
-    // const [lastName, setLastName] = useState(clientDetails[0].Last);
     const [email, setEmail] = useState('');
     const [planStart, setPlanStart] = useState('');
     const [planEnd, setPlanEnd] = useState('');
-    const [hasOrder, setHasOrder] = useState('');
+    const [hasOrder, setHasOrder] = useState<boolean>(false);
     const [isVisible, setIsVisible] = useState(false);
     const [isVisibleMain, setIsVisibleMain] = useState(true);
 
-
-    useEffect(() => {
-        const fetchClientDetails = async () => {
-          try {
-              if(ClientId > 0){
-                  const response = await fetch('http://10.0.2.2:4000/api/getclientdetail', {
-                      method: 'POST',
-                      headers: {
-                          'Accept':'application/json',
-                          'Content-Type': 'application/json',
-                      },
-                      body: JSON.stringify({ ClientId }),
-                  }).catch((err) => {
-                      console.log('Error   ',err);
-                  });
-                  const data = await response.json();
-                  setHasOrder(data[0].HasOrder ? '1' : '0');
-                  setEmail(data[0].Email);
-                  setPlanStart(data[0].PlanStart);
-                  setPlanEnd(data[0].PlanEnd);
-                  setClientDetails(data);
-                  setLoading(false);
-              }
-          }
-          catch (err) {
-              setError(err);
-          } finally {
-              setLoading(false);
-          }
-        };
-
-        fetchClientDetails();
-    }, [ClientId]);
-
-
+    /**
+     * 
+     * Extract client details on component load 
+     */
     const fetchClientDetails = async () => {
       try {
           if(ClientId > 0){
@@ -76,25 +47,45 @@ const ClientDetail = ({route}) => {
                       'Content-Type': 'application/json',
                   },
                   body: JSON.stringify({ ClientId }),
-              }).catch((err) => {
+              }).then(res => res.json())
+              .catch((err) => {
                   console.log('Error   ',err);
               });
+
               const data = await response.json();
-              setHasOrder(data[0].HasOrder ? '1' : '0');
+              setHasOrder(data[0].HasOrder ? true : false);
               setEmail(data[0].Email);
               setPlanStart(data[0].PlanStart);
               setPlanEnd(data[0].PlanEnd);
               setClientDetails(data);
               setLoading(false);
           }
-      }
-      catch (err) {
-          setError(err);
-      } finally {
-          setLoading(false);
-      }
+        }
+        catch (err: unknown) {
+          if (err instanceof Error) {
+            console.error(err.message);
+            setError(err);  // Assign the error to the state
+            Alert.alert('Error', err.message);
+          } else {
+              console.error('Unexpected error', err);
+              Alert.alert('Error', 'An unexpected error occurred.');
+          }      
+        } 
+        finally {
+            setLoading(false);
+        }
     };
 
+    
+    useEffect(() => {
+      fetchClientDetails();
+      fetchClientDetails();
+    }, [ClientId]);
+
+
+    /**
+     * Update client details using fetch and ajax frameworks
+     */
     const updateDetails = async() => {
       try {
         console.log('CLIENT ID   \n',ClientId);
@@ -128,8 +119,15 @@ const ClientDetail = ({route}) => {
               // setLoading(false);
           }
       }
-      catch (err) {
-          setError(err);
+      catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error(err.message);
+          setError(err);  // Assign the error to the state
+          Alert.alert('Error', err.message);
+        } else {
+            console.error('Unexpected error', err);
+            Alert.alert('Error', 'An unexpected error occurred.');
+        }      
       } finally {
           setLoading(false);
       }
@@ -159,10 +157,18 @@ const ClientDetail = ({route}) => {
         );
     }
 
-    const formatDate = (dateTimeString) => {
+    /**
+     * Performs date formatting for client view 
+     * @param dateTimeString 
+     * @returns 
+     */
+    const formatDate = (dateTimeString: string) => {
         return format(new Date(dateTimeString), 'MMMM dd, yyyy');
     };
 
+    /**
+     * Callbakc for update client detail event handler 
+     */
     const saveDetails = () => {
       // Save the updated details (e.g., make an API call to update the data on the server)
       console.log('Updated details:', { email, planStart, planEnd, hasOrder });
@@ -170,6 +176,9 @@ const ClientDetail = ({route}) => {
       setIsEditable(false); // Disable editing mode after saving
     };
 
+    /**
+     * Toggle detail editability event handler
+     */
     const toggleEditMode = () => {
       setIsEditable(!isEditable);
       console.log(isEditable);
@@ -220,13 +229,11 @@ const ClientDetail = ({route}) => {
                         <Text style={styles.labels}>Has Order:</Text>
                         <TextInput
                           style={styles.textInput}
-                          value={hasOrder}
-                          onChangeText={(value) => setHasOrder(value === '1')}
+                          value={hasOrder ? '1' : '0'}                          onChangeText={(value) => setHasOrder(value === '1')}
                           placeholder="Has Order"
                           keyboardType="numeric"
                           editable={isEditable}
                         />
-                        {/* clientDetails[0].HasOrder ? '1' : '0' */}
                       </View>
                     )}
 
@@ -287,9 +294,9 @@ const styles = StyleSheet.create({
       marginTop: 20,
     },
     detailText: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        marginBottom: 10,
+      fontSize: 22,
+      fontWeight: 'bold',
+      marginBottom: 10,
      },
     loadingContainer: {
       flex: 1,
@@ -306,13 +313,13 @@ const styles = StyleSheet.create({
       color: 'red',
     },
     heading: {
-        fontSize: 30,
-        fontWeight: 'bold',
+      fontSize: 30,
+      fontWeight: 'bold',
     },
     labels:{
-        paddingBottom: 5,
-        fontSize: 22,
-        fontWeight: 'bold',
+      paddingBottom: 5,
+      fontSize: 22,
+      fontWeight: 'bold',
     },
     labelClient:{
       paddingBottom: 5,
@@ -323,8 +330,8 @@ const styles = StyleSheet.create({
       marginBottom: 20,
     },
     background: {
-        flex: 1,
-        resizeMode: 'cover', // or 'stretch' or 'contain'
+      flex: 1,
+      resizeMode: 'cover', // or 'stretch' or 'contain'
     },
     textInput: {
       height: 40,

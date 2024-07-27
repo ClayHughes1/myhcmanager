@@ -15,6 +15,10 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { isValid } from 'date-fns';
 
+/**
+ * Add client window
+ * @returns 
+ */
 const AddClient = () =>{
     const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
     const [email, setEmail] = useState('');
@@ -29,6 +33,13 @@ const AddClient = () =>{
     const [displayStartDate, setStartDisplayDate] = useState('');
     const [displayEndDate, setEndDisplayDate] = useState('');
 
+    /**
+     * POST request to insert client data into dbms
+     * @params (email)  string
+     * @params (firstName)  string
+     * @params (lastName)   string
+     * Post framework (fetch)
+     */
     const addClient = async() => {
         if(email === '' && firstName === '' && lastName === '')
         {
@@ -60,13 +71,18 @@ const AddClient = () =>{
             }
         }
     };
-
+    /**
+     * Populates setHasOrder DropDownPicker
+    */
     const [items, setItems] = useState([
         {label: 'Select', value: '0'},
         {label: 'No', value: '1'},
         {label: 'Yes', value: '2'},
     ]);
 
+    /**
+     * Navigates to MeetingScheduler component 
+     */
     const addMeetingDate = async() => {
         try {
             navigation.navigate('MeetingScheduler',{email, firstName, lastName,})
@@ -75,6 +91,9 @@ const AddClient = () =>{
         }
     };
 
+    /**
+     * Shows and hides start date datetimepicker
+     */
     const showStartDatepicker = () => {
         try {
             setShow(true);
@@ -83,6 +102,9 @@ const AddClient = () =>{
         }
     };
 
+    /**
+     * Shows and hides end date datetimepicker
+     */
     const showEndDatepicker = () => {
         try {
             setShow(true);
@@ -91,6 +113,11 @@ const AddClient = () =>{
         }
     };
 
+    /**
+     * Handles start date change event
+     * @param event 
+     * @param selectedDate 
+     */
     const onStartChange = (event, selectedDate) => {
         try {
             const currentDate = selectedDate || startdate;
@@ -111,6 +138,11 @@ const AddClient = () =>{
         }
     };
 
+    /**
+     * Handles end date change event
+     * @param event 
+     * @param selectedDate 
+     */
     const onEndChange = (event, selectedDate) => {
         try {
                     // const currentDate = selectedDate || enddate;
@@ -126,6 +158,11 @@ const AddClient = () =>{
         }
     };
 
+    /**
+     * Handles hasOrder change event
+     * @param event 
+     * @param selectedDate 
+     */
     const handleChangeValue = (value) => {
         try {
             if(value > 0)
@@ -140,14 +177,17 @@ const AddClient = () =>{
         }
     };
 
-const clearFields = () => {
-    setEmail('');
-    setFirstName('');
-    setLastName('');
-    setStartDate(new Date());
-    setEndDate(new Date());
-    setHasOrder(null);
-};
+    /**
+     * Performs input field sanitation functionality
+     */
+    const clearFields = () => {
+        setEmail('');
+        setFirstName('');
+        setLastName('');
+        setStartDate(new Date());
+        setEndDate(new Date());
+        setHasOrder(null);
+    };
 
     return(
         <ImageBackground source={require('../components/img/app_admim_portal_bch.gif')}

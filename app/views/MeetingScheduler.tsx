@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Text, View , StyleSheet, TouchableWithoutFeedback } from 'react-native';
-import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import { DateTimePickerAndroid, DateTimePickerEvent  } from '@react-native-community/datetimepicker';
 import {
     TextInput,
     Alert,
@@ -18,8 +18,13 @@ const SchedulerScreen = () => {
     const [userEmail, setUserEmail] = useState<string>('');
     const [emailError, setEmailError] = useState<string | null>('');
     const [date, setDate] = useState(new Date());
+    const [mode, setMode] = useState<'date' | 'time' | 'datetime'>('date');
+    const [error, setError] = useState<Error | null>(null);
 
-
+    /**
+     * Function to validate client record exists
+     * @param email string
+     */
     const isValidClient = async () => {
         try {
             await fetch('http://10.0.2.2:4000/api/isvalidclientemail', {
@@ -50,19 +55,36 @@ const SchedulerScreen = () => {
         }
     };
 
-    const onChange = (event, selDate) => {
+    /**
+     * Event hanlder for 
+     * @param event 
+     * @param selDate 
+     */
+    const onChange = (event: DateTimePickerEvent, selDate?: Date) => {
         try {
             if(selDate)
             {
-                const currentDate = selDate;
+                const currentDate = selDate || date;
                 setDate(currentDate);
             }
-        } catch (error) {
-            console.error('Error   ',err);
+        }catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }  
         }
     };
 
-    const showMode = (currentMode) => {
+    /**
+     * Event handler responsible for the display mode for the datepicker 
+     * determined by the device platform
+     * @param currentMode 
+     */
+    const showMode = (currentMode: 'date' | 'time')  => {
         try {
             DateTimePickerAndroid.open({
                 value: date,
@@ -70,27 +92,57 @@ const SchedulerScreen = () => {
                 mode: currentMode,
                 is24Hour: false,
             });
-        } catch (error) {
-            console.error('Error   ',err);
-        }
+        }catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
+    /**
+     * Function to declare the DatePicker show mode
+    */
     const showDatepicker = () => {
         try {
             showMode('date');
-        } catch (error) {
-            console.error('Error   ',err);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }  
         }
     };
 
+    /**
+     * Function to determine the show mode for the TimePicker
+    */
     const showTimepicker = () => {
         try {
             showMode('time');
-        } catch (error) {
-            console.error('Error   ',err);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }  
         }
     };
 
+    /**
+     * Function to validate the email format is in correct format
+    */
     const validateEmail = () => {
         try {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -99,29 +151,60 @@ const SchedulerScreen = () => {
             } else {
               setEmailError('');
             }
-        } catch (error) {
-            console.error(error);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }  
         }
     };
 
-    const handleEmailChange = (email) => {
+    /**
+     * Event to handle Email text input change event
+     * @param email 
+    */
+    const handleEmailChange = (email: string) => {
         try {
             setUserEmail(email);
-        } catch (error) {
-            console.error(error);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }  
         }
     };
 
+    /**
+     * Event handler for Email input onBlur event
+    */
     const handleOnBlur = () => {
         try {
             validateEmail();
             isValidClient();
-        } catch (error) {
-            console.error(error);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }  
         }
     };
 
-    const addAppintment = () => {
+    /**
+     * Handles navigation to Appintment screen 
+    */
+    const addAppointment = () => {
         try {
             if(userEmail !== ''){
                 navigation.navigate('Appointment',{email: userEmail});
@@ -129,11 +212,21 @@ const SchedulerScreen = () => {
             else {
                 Alert.alert('Email is required. ');
             }
-        } catch (error) {
-            console.error(error);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }  
         }
     };
 
+    /**
+     * Handles navigation to MyAppointment component to display list of appointments
+    */
     const viewMyAppointments = () => {
         try {
             if(userEmail !== ''){
@@ -169,7 +262,7 @@ const SchedulerScreen = () => {
                         </View>
                     </View>
                     <View style={styles.row}>
-                        <TouchableOpacity style={styles.touchStyle} onPress={() => addAppintment()}>
+                        <TouchableOpacity style={styles.touchStyle} onPress={() => addAppointment()}>
                             <Text style={styles.rmvButton}>Add</Text>
                         </TouchableOpacity>
 

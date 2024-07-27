@@ -9,7 +9,6 @@ import {
     ImageBackground,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// import { useNavigation } from '@react-navigation/native';
 import {ParamListBase, useNavigation} from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -19,6 +18,10 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setUserPassword] = useState('');
 
+    /**
+     * Event hanlder for login button click
+     * @returns 
+     */
     const handleLogin = async () => {
         try {
             if (!email || !password) {
@@ -33,7 +36,6 @@ const Login = () => {
                 body: JSON.stringify({ email, password }),
             }).then((res) => res.json())
             .then((json) => {
-                // const data =  json;
                 if (json.success) {
                     navigation.navigate('Admin');
                 } else {
@@ -48,6 +50,10 @@ const Login = () => {
         }
     };
 
+    /**
+     * Event handler for cancle login button click
+     * Navigage to Home screen
+     */
     const cancelLogin = ()=>{
         navigation.navigate('Home');
     };

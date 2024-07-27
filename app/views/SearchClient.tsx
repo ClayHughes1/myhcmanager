@@ -4,9 +4,7 @@ import {
     Text,
     View,
     TextInput,
-    // TouchableHighlight,
     TouchableOpacity,
-    // ImageBackground,
 } from 'react-native';
 import {ParamListBase, useNavigation} from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';

@@ -10,18 +10,25 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
+import {AdminAppData} from '../../src/types/interfaces';
 
 const ViewAppointments = () => {
     const [meetings, setMeetings] = useState({});
-    let [monthOp, setMonthOp] = useState(null);
+    let [monthOp, setMonthOp] = useState<string>('');
     const [open, setOpen] = useState(false);
     // const [markedDates, setMarkedDates] = useState({});
-    const [dateData, setDateData] = useState([]);
+    const [dateData, setDateData] = useState<AdminAppData[]>([]);
     const [selectedDate, setSelectedDate] = useState('2024-05-01');
+    let [formattedMonthOp,setFormattedMonthOp] = useState<string>();
+    const [error, setError] = useState<Error | null>(null);
 
+    /**
+     * Function to extract meeting data 
+     * Uses fetch framework and ajax to call api 
+     */
     const fetchMeetings = async () => {
         try {
-            if(monthOp > 0)
+            if (formattedMonthOp && parseInt(formattedMonthOp, 10) < 10) 
             {
                 // Alert.alert('Month criteria met.');
 
@@ -43,12 +50,24 @@ const ViewAppointments = () => {
 
                 setDateData(response);
             }
-        } catch (error) {
-            console.error(error);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                console.error(err.message);
+                setError(err);
+                Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }
         }
     };
 
-    const cancelMeetingOps = async (Id) => {
+    /**
+     * Evewnt hanlder for removing meeting data from db
+     * Uses fetch and ajax to submit query params to api call
+     * @param Id 
+     */
+    const cancelMeetingOps = async (Id: number) => {
         try {
             if(Id > 0)
             {
@@ -73,54 +92,90 @@ const ViewAppointments = () => {
                     console.error('Error   ',err);
                 });
             }
-        } catch (error) {
-            console.error(error);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                console.error(err.message);
+                setError(err);
+                Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }
         }
     };
 
-    const handlChange = async () => {
+    /**
+     * Event handler for month drop down change
+     */
+    const handleChange = async () => {
         try {
 
-            if(monthOp < 10)
-            {
-                monthOp = '0' + monthOp;
+            // if(monthOp < 10)
+            // {
+            //     monthOp = '0' + monthOp;
+            // }
+
+            // let formattedMonthOp = monthOp;
+            setFormattedMonthOp(monthOp);
+            if (formattedMonthOp && parseInt(formattedMonthOp, 10) < 10) {
+                formattedMonthOp = '0' + formattedMonthOp;
             }
 
             const currentYear = new Date().getFullYear();
-            const newDate = `${currentYear}-${monthOp}-01`;
+            const newDate = `${currentYear}-${formattedMonthOp}-01`;
             setSelectedDate(newDate);
             fetchMeetings();
-        } catch (error) {
-            console.error(error);
-            Alert.alert('Something has changed.' + error);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                console.error(err.message);
+                setError(err);
+                Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }
         }
     };
 
-    const  convertToStandardTime = (militaryTime) => {
+    /**
+     * Converts military time to standard utc date time value
+     * @param militaryTime 
+     * @returns 
+     */
+    const  convertToStandardTime = (militaryTime: string) => {
         try {
-                    // Splitting the military time into hours and minutes
-        const [hours, minutes] = militaryTime.split(':');
+            // Splitting the military time into hours and minutes
+            const [hours, minutes] = militaryTime.split(':');
 
-        // Converting hours to a number
-        let hour = parseInt(hours, 10);
+            // Converting hours to a number
+            let hour = parseInt(hours, 10);
 
-        // Determining AM or PM
-        const period = (hour < 12) ? 'AM' : 'PM';
+            // Determining AM or PM
+            const period = (hour < 12) ? 'AM' : 'PM';
 
-        // Converting from military time to standard time
-        hour = (hour > 12) ? hour - 12 : hour;
-        hour = (hour === 0) ? 12 : hour; // Handle midnight
+            // Converting from military time to standard time
+            hour = (hour > 12) ? hour - 12 : hour;
+            hour = (hour === 0) ? 12 : hour; // Handle midnight
 
-        // Formatting the result
-        const standardTime = `${hour}:${minutes} ${period}`;
+            // Formatting the result
+            const standardTime = `${hour}:${minutes} ${period}`;
 
-        return standardTime;
-
-        } catch (error) {
-            console.error(error);
+            return standardTime;
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                console.error(err.message);
+                setError(err);
+                Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }
         }
     };
 
+    /**
+     * Creates list object data for month drop donw picker 
+     */
     const [items, setItems] = useState([
         { label: 'Select', value: '0' },
         { label: 'January', value: '1' },
@@ -137,11 +192,22 @@ const ViewAppointments = () => {
         { label: 'December', value: '12' },
     ]);
 
-    const cancelMeeting = async(meetId) => {
+    /**
+     * Call back method for cancel meeting ops function
+     * @param meetId 
+     */
+    const cancelMeeting = async(meetId: number) => {
         try {
             cancelMeetingOps(meetId);
-        } catch (error) {
-            console.error('An error occurred  ',error);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                console.error(err.message);
+                setError(err);
+                Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }
         }
     };
 
@@ -163,7 +229,7 @@ const ViewAppointments = () => {
                             zIndex={3000}
                             zIndexInverse={1000}
                             dropDownContainerStyle={{height:300}}
-                            onChangeValue={handlChange}
+                            onChangeValue={handleChange}
                             listMode="SCROLLVIEW"
                             placeholder="Select your month"
                         />

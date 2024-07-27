@@ -1,9 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
 import React from 'react';
 import HomeScreen from './app/views/Home.tsx';
 import { NavigationContainer } from '@react-navigation/native';
@@ -32,11 +26,6 @@ function App(): React.JSX.Element {
             options={{title: 'Home',headerShown: false}}
         />
         <Stack.Screen
-            name="MeetingScheduler"
-            component={SchedulerScreen}
-            options={{title: 'Scheduler'}}
-        />
-        <Stack.Screen
             name="Register"
             component={Register}
             options={{title: 'Register'}}
@@ -56,6 +45,11 @@ function App(): React.JSX.Element {
             component={ClientResults}
             options={{title: 'My Clients'}}
         />
+        <Stack.Screen
+            name="MeetingScheduler"
+            component={SchedulerScreen}
+            options={{title: 'Scheduler'}}
+        /> 
         <Stack.Screen
             name="AddClient"
             component={AddClient}
@@ -88,7 +82,6 @@ function App(): React.JSX.Element {
         />
       </Stack.Navigator>
     </NavigationContainer>
-
   );
 }
 

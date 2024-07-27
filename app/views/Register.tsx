@@ -8,24 +8,29 @@ import {
     Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 
 const RegisterScreen = () => {
+    const [userEmail, setUserEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [cnfPassword, setcnfPassword] = useState('');
     const navigation = useNavigation();
 
+    /**
+     * Handles navigation event on button click
+     */
     const cancelRegister = ()=>{
         Alert.alert('Login cancelled');
         navigation.navigate('Home');
     };
 
+    /**
+     * Function to navigate to create account record
+    */
     const createAccount = ()=>{
         navigation.navigate('Register');
     };
-
-
-    const [userEmail, setUserEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [cnfPassword, setcnfPassword] = useState('');
 
     return (
         <View style={styles.container}>

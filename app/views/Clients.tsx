@@ -1,6 +1,4 @@
 import React,{useEffect,useState} from 'react';
-//, { useState }
-// import { Col, Row, Grid } from 'react-native-easy-grid';
 import {
     SafeAreaView,
     // ScrollView,
@@ -13,19 +11,17 @@ import {
 } from 'react-native';
 import {ParamListBase, useNavigation} from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
-// add notes for client support notes
-
+import {Client} from '../../src/types/interfaces';
 
 const ClientResultsScreen = () => {
     const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
-    const [data, setData] = useState([]);
+    const [data, setData] = useState<Client[] | null>([]);
     const [loading, setLoading] = useState(true);
-    // const [clientId, setClientId] = useState('');
 
-    // const getClients = async() => {
-    // }
-
+    /**
+     * Extract client list on screen load
+     * Use fetch framework and ajax to call api that extracts client information
+     */
     useEffect(() => {
         fetch('http://10.0.2.2:4000/api/data')
             .then((response) => response.json())
@@ -39,6 +35,9 @@ const ClientResultsScreen = () => {
             });
     }, []);
 
+    /**
+     * Display loading message while client information is extracted
+     */
     if (loading) {
         return (
             <View style={styles.container}>
@@ -47,8 +46,11 @@ const ClientResultsScreen = () => {
         );
     }
 
-    const getClientDetail = async(item) => {
-        console.log('GETTING CLIENT DETAIL.....................',item.Id);
+    /**
+     * Navigate to CLient Details screen passing client id as a route paramater
+     * @param item 
+     */
+    const getClientDetail = async(item: any) => {
         navigation.navigate('ClientDetail',{ClientId: item.Id});
     };
 
@@ -58,23 +60,7 @@ const ClientResultsScreen = () => {
             <View style={styles.container}>
                 <Text style={styles.heading}>My Client List</Text>
                 <SafeAreaView style={styles.container}>
-                    {/* <View style={styles.tableHeader}>
-                        <Text style={styles.itemEmailCell}>Email</Text>
-                        <Text style={styles.itemCell}>First</Text>
-                        <Text style={styles.itemCell}>Last</Text>
-                    </View> */}
                         <View style={styles.listParent}>
-                            {/* {data.map((item) => (
-                                <TouchableOpacity key={item.Id}  onPress={() => getClientDetail(item)}>
-                                    <View style={styles.item}>
-                                        <Text style={styles.itemEmailCell}>{item.Email}</Text>
-                                        <Text style={styles.itemCell}>{item.First}</Text>
-                                        <Text style={styles.itemCell}>{item.Last}</Text>
-                                    </View>
-                                </TouchableOpacity>
-
-                            ))} */}
-
                             <FlatList
                                 style={styles.list}
                                     data={data}

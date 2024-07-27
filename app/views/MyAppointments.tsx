@@ -10,50 +10,70 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
+import {MyAppData} from '../../src/types/interfaces';
 
 const MyAppointments = ({route}) => {
     const { email } = route.params;
-    const [appData, setAppData] = useState([]);
+    const [appData, setAppData] = useState<MyAppData[]>([]);
     const [open, setOpen] = useState(false);
-    let [monthOp, setMonthOp] = useState('');
-    const [filteredData, setFilteredData] = useState([]);
+    let [monthOp, setMonthOp] = useState<string>('');
+    const [filteredData, setFilteredData] = useState<MyAppData[]>([]);
     const [isFiltered, setIsFiltered] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    /**
+     * Extract a list of appointments from
+     * Use fetch and ajax to query db returnin a list of appointments
+     */
+    const fetchMyAppts = async () => {
+        try {
+            if(email !== '' || email !== undefined)
+            {
+                console.log(email);
+
+                // Alert.alert('Month criteria met.');
+
+                await fetch('http://10.0.2.2:4000/api/getmyappts', {
+                    method: 'POST',
+                    headers: {
+                        'Accept':'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email }),
+                }).then((res) => res.json())
+                .then((json) => {
+                    // const data = json.data;
+                    setAppData(json.data);
+                    setFilteredData(json.data);
+                    // return data;
+                })
+                .catch((err) => {
+                    console.error('Error   ',err);
+                });
+            }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            } 
+        }
+    };
 
     useEffect(() => {
-        const fetchMyAppts = async () => {
-            try {
-                if(email !== '' || email !== undefined)
-                {
-                    console.log(email);
-
-                    // Alert.alert('Month criteria met.');
-
-                    await fetch('http://10.0.2.2:4000/api/getmyappts', {
-                        method: 'POST',
-                        headers: {
-                            'Accept':'application/json',
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ email }),
-                    }).then((res) => res.json())
-                    .then((json) => {
-                        // const data = json.data;
-                        setAppData(json.data);
-                        setFilteredData(json.data);
-                        // return data;
-                    })
-                    .catch((err) => {
-                        console.error('Error   ',err);
-                    });
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        };
         fetchMyAppts();
     }, [email]);
 
-    const  convertToStandardTime = (militaryTime) => {
+
+    /**
+     * COnverts military time to UTCDate string
+     * @param militaryTime 
+     * @returns 
+     */
+    const  convertToStandardTime = (militaryTime: string) => {
         try {
             // Splitting the military time into hours and minutes
             const [hours, minutes] = militaryTime.split(':');
@@ -73,36 +93,53 @@ const MyAppointments = ({route}) => {
 
             return standardTime;
 
-        } catch (error) {
-            console.error(error);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            } 
         }
     };
 
-    const handlChange = async () => {
+    /**
+     * Event handler for Month DropDownPicker index change
+    */
+    const handleChange = async () => {
         try {
-            if(monthOp < 1)
-            {
-                setAppData(filteredData);
+            let formattedMonthOp = monthOp;
+            if (formattedMonthOp && parseInt(formattedMonthOp, 10) < 10) {
+                formattedMonthOp = '0' + formattedMonthOp;
+            }
 
+            if (!formattedMonthOp || parseInt(formattedMonthOp, 10) < 1) {
+                setAppData(filteredData);
             } else {
-                if(monthOp < 10)
-                {
-                    monthOp = '0' + monthOp;
-                }
-                const filtered = filteredData.filter(item => item.MeetDate.split('-')[1] === monthOp);
-                if(filtered.length === 0)
-                {
-                    Alert.alert('No data found for the selected month. ');
-                }else {
+                const filtered = filteredData.filter(item => item.MeetDate.split('-')[1] === formattedMonthOp);
+                if (filtered.length === 0) {
+                    Alert.alert('No data found for the selected month.');
+                } else {
                     setAppData(filtered);
                 }
             }
-        } catch (error) {
-            console.error(error);
-            Alert.alert('Something has changed.' + error);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                console.error(err.message);
+                setError(err);
+                Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }
         }
     };
 
+    /**
+     * Create list for Month list object
+     */
     const [items, setItems] = useState([
         { label: 'Select', value: '0' },
         { label: 'January', value: '1' },
@@ -136,7 +173,7 @@ const MyAppointments = ({route}) => {
                             zIndex={3000}
                             zIndexInverse={1000}
                             // dropDownContainerStyle={{height:100}}
-                            onChangeValue={handlChange}
+                            onChangeValue={handleChange}
                             listMode="SCROLLVIEW"
                             placeholder="Select your month"
                     />
