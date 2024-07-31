@@ -113,10 +113,6 @@ const ClientDetail = ({route }) => {
               .catch((err) => {
                   console.log('Error   ',err);
               });
-              // const data = await response.json();
-
-              // setClientDetails(data);
-              // setLoading(false);
           }
       }
       catch (err: unknown) {
@@ -170,21 +166,40 @@ const ClientDetail = ({route }) => {
      * Callbakc for update client detail event handler 
      */
     const saveDetails = () => {
-      // Save the updated details (e.g., make an API call to update the data on the server)
-      console.log('Updated details:', { email, planStart, planEnd, hasOrder });
-      updateDetails();
-      setIsEditable(false); // Disable editing mode after saving
+      try {
+        // Save the updated details (e.g., make an API call to update the data on the server)
+        updateDetails();
+        setIsEditable(false); // Disable editing mode after saving
+      }catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error(err.message);
+          setError(err);  // Assign the error to the state
+          Alert.alert('Error', err.message);
+        } else {
+            console.error('Unexpected error', err);
+            Alert.alert('Error', 'An unexpected error occurred.');
+        } 
     };
 
     /**
      * Toggle detail editability event handler
      */
     const toggleEditMode = () => {
-      setIsEditable(!isEditable);
-      console.log(isEditable);
-
-      setIsVisible(true);
-      setIsVisibleMain(false);
+      try {
+        setIsEditable(!isEditable);
+        console.log(isEditable);
+  
+        setIsVisible(true);
+        setIsVisibleMain(false);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error(err.message);
+          setError(err);  // Assign the error to the state
+          Alert.alert('Error', err.message);
+        } else {
+            console.error('Unexpected error', err);
+            Alert.alert('Error', 'An unexpected error occurred.');
+        } 
     };
 
     return(

@@ -14,6 +14,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { isValid } from 'date-fns';
+import {ResponseItem, MarkedDate} from '../../src/types/interfaces';
 
 /**
  * Add client window
@@ -32,6 +33,7 @@ const AddClient = () =>{
     const [show, setShow] = useState(false);
     const [displayStartDate, setStartDisplayDate] = useState('');
     const [displayEndDate, setEndDisplayDate] = useState('');
+    const [error, setError] = useState<Error | null>(null);
 
     /**
      * POST request to insert client data into dbms
@@ -66,9 +68,16 @@ const AddClient = () =>{
                 .catch((err) => {
                     console.error('Error   ',err);
                 });
-            } catch (error) {
-                console.error('ERROR ',error);
-            }
+            } catch (err: unknown) {
+                if (err instanceof Error) {
+                  console.error(err.message);
+                  setError(err);  // Assign the error to the state
+                  Alert.alert('Error', err.message);
+                } else {
+                    console.error('Unexpected error', err);
+                    Alert.alert('Error', 'An unexpected error occurred.');
+                }      
+            } 
         }
     };
     /**
@@ -86,9 +95,16 @@ const AddClient = () =>{
     const addMeetingDate = async() => {
         try {
             navigation.navigate('MeetingScheduler',{email, firstName, lastName,})
-        } catch (error) {
-            console.error('ERROR ',error);
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
     /**
@@ -97,9 +113,16 @@ const AddClient = () =>{
     const showStartDatepicker = () => {
         try {
             setShow(true);
-        } catch (error) {
-            console.error('ERROR ',error);
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
     /**
@@ -108,9 +131,16 @@ const AddClient = () =>{
     const showEndDatepicker = () => {
         try {
             setShow(true);
-        } catch (error) {
-            console.error('ERROR ',error);
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
     /**
@@ -121,21 +151,23 @@ const AddClient = () =>{
     const onStartChange = (event, selectedDate) => {
         try {
             const currentDate = selectedDate || startdate;
-            // setShow(Platform.OS === 'android');
-            // setShow(Platform.OS === 'ios');
-            // setStartDate(currentDate);
 
             setShow(false);
             setStartDate(currentDate);
 
-            // setStartDate(selectedDate);
-
             const formattedDate = currentDate.toLocaleDateString();
             setStartDisplayDate(formattedDate);
 
-        } catch (error) {
-            console.error('ERROR ',error);
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
     /**
@@ -145,17 +177,21 @@ const AddClient = () =>{
      */
     const onEndChange = (event, selectedDate) => {
         try {
-                    // const currentDate = selectedDate || enddate;
-            // setShow(Platform.OS === 'android');
             setShow(false);
-            // setShow(Platform.OS === 'ios');
             setEndDate(selectedDate);
 
             const formattedDate = selectedDate.toLocaleDateString();
             setEndDisplayDate(formattedDate);
-        } catch (error) {
-            console.error('ERROR ',error);
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
     /**
@@ -172,9 +208,16 @@ const AddClient = () =>{
             else {
                 Alert.alert('Please select a valid option. ');
             }
-        } catch (error) {
-            console.error('An error occurred  ',error);
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
     /**

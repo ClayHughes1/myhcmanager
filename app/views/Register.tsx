@@ -16,20 +16,44 @@ const RegisterScreen = () => {
     const [password, setPassword] = useState('');
     const [cnfPassword, setcnfPassword] = useState('');
     const navigation = useNavigation();
+    const [error, setError] = useState<Error | null>(null);
 
     /**
      * Handles navigation event on button click
      */
     const cancelRegister = ()=>{
-        Alert.alert('Login cancelled');
-        navigation.navigate('Home');
+        try {
+            Alert.alert('Login cancelled');
+            navigation.navigate('Home');
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
+
     };
 
     /**
      * Function to navigate to create account record
     */
     const createAccount = ()=>{
-        navigation.navigate('Register');
+        try {
+            navigation.navigate('Register');
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
     return (

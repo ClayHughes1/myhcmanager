@@ -39,20 +39,24 @@ const SchedulerScreen = () => {
                 const data = json.data;
                 if(json.success  === true){
                     Alert.alert(json.message);
-                    //('This email does not exist as a client. Please contact your health coach to create an account for you.');
                 }
                 else {
                     Alert.alert(json.message);
-
-                    // Alert.alert('This email does not exist as a client. Please contact your health coach to create an account for you.');
                 }
             })
             .catch((err) => {
                 console.error('Error   ',err);
             });
-        } catch (error) {
-            console.error(error);
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
     /**
@@ -235,8 +239,15 @@ const SchedulerScreen = () => {
             else {
                 Alert.alert('Email is required. ');
             }
-        } catch (error) {
-            console.error(error);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }  
         }
     };
 

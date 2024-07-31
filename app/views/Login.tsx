@@ -17,6 +17,7 @@ const Login = () => {
     const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
     const [email, setEmail] = useState('');
     const [password, setUserPassword] = useState('');
+    const [error, setError] = useState<Error | null>(null);
 
     /**
      * Event hanlder for login button click
@@ -44,10 +45,16 @@ const Login = () => {
             }).catch((err) => {
                 console.error('Error   ',err);
             });
-        } catch (error) {
-            console.error(error);
-            Alert.alert('Error', 'An error occurred while trying to log in');
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
     /**
@@ -77,10 +84,8 @@ const Login = () => {
             <TouchableHighlight style={styles.touchBack} onPress={cancelLogin} underlayColor="#000000">
                 <Text style = {styles.buttons}>Cancel</Text>
             </TouchableHighlight>
-
         </View>
         </ImageBackground>
-
     );
 };
 

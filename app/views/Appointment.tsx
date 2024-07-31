@@ -14,7 +14,10 @@ import {ParamListBase, useNavigation} from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import RNCalendarEvents, { AuthorizationStatus } from 'react-native-calendar-events';
 import { RouteProp } from '@react-navigation/native';
+import {ResponseItem, MarkedDate} from '../../src/types/interfaces';
 
+// Define the PermissionStatus type
+type PermissionStatus = 'authorized' | 'granted' | 'denied' | 'restricted' | 'undetermined' | 'prompt';
 
 const AppointmentScreen = ({route}) => {
     const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
@@ -31,11 +34,15 @@ const AppointmentScreen = ({route}) => {
     const [eventTitle, setEventTitle] = useState('Meeting with Liz(Health Coach)');
     const [eventStartDate, setEventStartDate] = useState('');
     const [isEnabled, setIsEnabled] = useState(false);
-    const [status, setStatus] = useState<PermissionStatus>(null);
+    const [status, setStatus] = useState<PermissionStatus>('prompt');
     const [selectedCalendarId, setSelectedCalendarId] = useState<string | undefined>('');
     const [calendars, setCalendars] = useState<any[]>([]); // Adjust based on actual type from 'react-native-calendar-events'
     const [showCalander, setShowCalander] = useState<boolean>(true);
+    const [error, setError] = useState<Error | null>(null);
 
+    /**
+     * Load dates with appointments in  to calendar and mark the dates with specefied color to indicate scheduled event
+     */
     const fetchAvailability = useCallback(async () => {
         try {
           const response = await fetch('http://10.0.2.2:4000/api/getavailability', {
@@ -46,7 +53,11 @@ const AppointmentScreen = ({route}) => {
             },
           }).then(res => res.json());
     
-          const data = response.data;
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const { data } = await response.json();
           const dates = data.map((item: ResponseItem) => item.Date);
           if (dates) {
             const marked = dates.reduce((acc: Record<string, MarkedDate>, dateVal: string) => {
@@ -58,38 +69,42 @@ const AppointmentScreen = ({route}) => {
         } catch (error) {
           console.error('Error fetching availability', error);
         }
-      }, []);
+    }, []);
     
-      const requestPermissions = useCallback(async () => {
-        const permissionStatus = await RNCalendarEvents.requestPermissions();
-        setStatus(permissionStatus);
+    /**
+     * Query calendar permissions for the available calendar on device 
+     * Load available device calendar
+     */
+    const requestPermissions = useCallback(async () => {
+        try {
+            const permissionStatus = await RNCalendarEvents.requestPermissions();
+            setStatus(permissionStatus);
+        
+            if (permissionStatus === 'authorized') {
+              const availableCalendars = await RNCalendarEvents.findCalendars();
+              setCalendars(availableCalendars);
+        
+              const modifiableCalendar = availableCalendars.find(cal => cal.allowsModifications);
+              if (modifiableCalendar) {
+                setSelectedCalendarId(modifiableCalendar.id.toString());
+              }
+            }
     
-        if (permissionStatus === 'authorized') {
-          const availableCalendars = await RNCalendarEvents.findCalendars();
-          setCalendars(availableCalendars);
-    
-          const modifiableCalendar = availableCalendars.find(cal => cal.allowsModifications);
-          if (modifiableCalendar) {
-            setSelectedCalendarId(modifiableCalendar.id.toString());
-          }
+        }  catch (error) {
+            console.error('An error occurred  ',error);
         }
-      }, [status]);
+    }, [status]);
     
-      useEffect(() => {
-        fetchAvailability();
-        requestPermissions();
-      }, [email, fetchAvailability, requestPermissions]);
+    useEffect(() => {
+        try {
+            fetchAvailability();
+            requestPermissions();
+        } catch (error) {
+            console.error('An error occurred  ',error);
+        }
 
-    interface ResponseItem {
-        Date: string; // Use the appropriate type (e.g., Date if it's a Date object)
-        Time: Date
-        // Add other properties if needed
-    }
+    }, [email, fetchAvailability, requestPermissions]);
 
-    interface MarkedDate {
-        marked: boolean;
-        dotColor: string;
-    }
 
     const fetchAvailabilityByDate = async (dayDate: Date) => {
         try {
@@ -111,7 +126,7 @@ const AppointmentScreen = ({route}) => {
         } catch (error) {
           console.error('Error fetching availability by date', error);
         }
-      };
+    };
 
     /**
      * Performs functionality to insert appointment data using fetch and ajax POST request
@@ -151,10 +166,16 @@ const AppointmentScreen = ({route}) => {
                 .catch((err) => {
                     console.error('Error   ',err);
                 });
-            } catch (error) {
-                console.error(error);
-                Alert.alert('Error', 'An error occurred while trying to create this appointment');
-            }
+            } catch (err: unknown) {
+                if (err instanceof Error) {
+                  console.error(err.message);
+                  setError(err);  // Assign the error to the state
+                  Alert.alert('Error', err.message);
+                } else {
+                    console.error('Unexpected error', err);
+                    Alert.alert('Error', 'An unexpected error occurred.');
+                }      
+            } 
         }
     };
 
@@ -193,9 +214,16 @@ const AppointmentScreen = ({route}) => {
 
             return standardTime;
 
-        } catch (error) {
-            console.error('An error occurred  ',error);
-        }
+        }catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
     /**
@@ -224,9 +252,16 @@ const AppointmentScreen = ({route}) => {
                 Alert.alert('Please select a date either today or in the future. ');
             }
 
-        } catch (error) {
-            console.error('ERROR    \n',error);
-        }
+        }catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
     /**
@@ -235,14 +270,28 @@ const AppointmentScreen = ({route}) => {
      * @param item 
      */
      const setDateAndTime = (item: any) => {
-        if(appTypeValue === ''){
-            Alert.alert('Please select an Meeting Type. ');
-        }
-        else {
-            setEventStartDate(`${item.Date}T${item.Time}`);
-            const selectedItem = meetDesc.find(item => item.value === appTypeValue);
-            createAppintment(userEmail, item.Date, item.Time, selectedItem.label,item.Id);
-        }
+        try {
+            if(appTypeValue === ''){
+                Alert.alert('Please select an Meeting Type. ');
+            }
+            else {
+                setEventStartDate(`${item.Date}T${item.Time}`);
+                const selectedItem = meetDesc.find(item => item.value === appTypeValue);
+                if (selectedItem) {
+                    createAppintment(userEmail, item.Date, item.Time, selectedItem.label,item.Id);                  } else {
+                    console.error('Selected item is undefined');
+                }
+            }
+        }catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
     /**
@@ -253,9 +302,16 @@ const AppointmentScreen = ({route}) => {
         try {
             setDateData([]);
             setShowCalander(true);
-        } catch (error) {
-            console.error('An error occurred  ',error);
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
     /**
@@ -265,9 +321,16 @@ const AppointmentScreen = ({route}) => {
     const handleChangeValue = (value: any) => {
         try {
             setAppTypeValue(value);
-        } catch (error) {
-            console.error('An error occurred  ',error);
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
     /**
@@ -276,9 +339,16 @@ const AppointmentScreen = ({route}) => {
     const goHome = () => {
         try {
             navigation.navigate('Home');
-        } catch (error) {
-            console.error('An error occurred  ',error);
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
     /**
@@ -307,12 +377,16 @@ const AppointmentScreen = ({route}) => {
             } else {
                 Alert.alert('Permission denied', 'Calendar permission is required to add an event.');
             }
-        } catch (error) {
-            console.log('Error adding event to calendar:', error);
-
-            console.error('Error adding event to calendar:', error);
-            Alert.alert('Error', 'There was an error adding the event to your calendar.');
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
 

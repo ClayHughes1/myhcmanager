@@ -29,10 +29,6 @@ const MyAppointments = ({route}) => {
         try {
             if(email !== '' || email !== undefined)
             {
-                console.log(email);
-
-                // Alert.alert('Month criteria met.');
-
                 await fetch('http://10.0.2.2:4000/api/getmyappts', {
                     method: 'POST',
                     headers: {

@@ -14,15 +14,14 @@ import {
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import DropDownPicker from 'react-native-dropdown-picker';
+import {Item} from '../../src/types/interfaces';
 
 
 const AddAvailability = () => {
-    // const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
-    // const [meetings, setMeetings] = useState({});
     let [monthOp, setMonthOp] = useState<any>(null);
     const [open, setOpen] = useState(false);
     const [markedDates, setMarkedDates] = useState({});
-    const [dateData, setDateData] = useState([]);
+    const [dateData, setDateData] = useState<Item[]>([]);
     const [selectedDate, setSelectedDate] = useState('2024-05-01');
     const [isVisible, setIsVisible] = useState(false);
     const [addDate, setAddDate] = useState('');
@@ -32,7 +31,11 @@ const AddAvailability = () => {
     const [isDisabled, setIsDisabled] = useState(true); // Example condition
     const [dayDate, setDayDate] = useState<any>(null);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
 
+    /**
+     * Extract coach availability from db using fetch framework
+     */
     const fetchAvailability = async () => {
         try {
             if(monthOp > 0)
@@ -63,11 +66,22 @@ const AddAvailability = () => {
                     setMarkedDates(marked);
                 }
             }
-        } catch (error) {
-            console.error(error);
-        }
+        }catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
+    /**
+     * Extract coack availability when by date selection using fetch framework
+     * @param dayDate 
+     */
     const fetchAvailabilityByDate = async (dayDate) => {
         try {
             await fetch('http://10.0.2.2:4000/api/getavailabilitybydate', {
@@ -90,11 +104,22 @@ const AddAvailability = () => {
             .catch((err) => {
                 console.error('Error   ',err);
             });
-        } catch (error) {
-            console.error(error);
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
+    /**
+     * Remove specific availability record from db using fetch framework
+     * @param Id 
+     */
     const removeDateOps = async (Id) => {
         try {
             if(Id > 0)
@@ -119,11 +144,23 @@ const AddAvailability = () => {
                     console.error('Error   ',err);
                 });
             }
-        } catch (error) {
-            console.error(error);
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
+    /**
+     * Create new availability by insertion into db using fetch framework
+     * @param date 
+     * @param time 
+     */
     const insertAvailability = async (date, time) => {
         try {
             await fetch('http://10.0.2.2:4000/api/addavailability', {
@@ -149,11 +186,21 @@ const AddAvailability = () => {
             .catch((err) => {
                 console.error('Error   ',err);
             });
-        } catch (error) {
-            console.error(error);
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
+    /**
+     * Hanlde drop down picker event change
+     */
     const handlChange = async () => {
         try {
 
@@ -167,12 +214,23 @@ const AddAvailability = () => {
             setSelectedDate(newDate);
             setDateData([]);
             fetchAvailability();
-        } catch (error) {
-            console.error(error);
-            Alert.alert('Something has changed.' + error);
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
+    /**
+     * Hanldes calendar date press event 
+     * @param day 
+     * @returns 
+     */
     const onDayPress = async(day) => {
         try {
             setDayDate(day.dateString);
@@ -183,11 +241,23 @@ const AddAvailability = () => {
             }
 
             fetchAvailabilityByDate(day.dateString);
-        } catch (error) {
-            console.error('ERROR    \n',error);
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
+    /**
+     * Convert military time to standard time 
+     * @param militaryTime 
+     * @returns 
+     */
     const convertToStandardTime = (militaryTime) => {
         try {
             // Splitting the military time into hours and minutes
@@ -208,27 +278,59 @@ const AddAvailability = () => {
 
             return standardTime;
 
-        } catch (error) {
-            console.error('An error occurred  ',error);
-        }
+        }catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
+    /**
+     * Clear list of appointments already scheduled
+     */
     const clearList = () => {
         try {
             setDateData([]);
-        } catch (error) {
-            console.error('An error occurred  ',error);
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
+    /**
+     * Callback for api call that removes an availability record from db
+     * @param dateId 
+     */
     const removeDate = (dateId) => {
         try {
             removeDateOps(dateId);
-        } catch (error) {
-            console.error('An error occurred  ',error);
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
+    /**
+     * Hanldes date selection validation 
+     * @returns 
+     */
     const addDateTime = () => {
         try {
             if(addDate === '')
@@ -239,11 +341,21 @@ const AddAvailability = () => {
             }else {
                 setIsVisible(!isVisible);
             }
-        } catch (error) {
-            console.error('An error occurred  ',error);
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
+    /**
+     * Performs date and time validation prior to creating/inserting new availability record into db
+     */
     const commitNewAvailabiity = () => {
         try {
             if (validateTime(hours, minutes)) {
@@ -266,12 +378,24 @@ const AddAvailability = () => {
             } else {
                 Alert.alert('Invalid Time', 'Please enter a valid time.');
             }
-        } catch (error) {
-            console.error(error);
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
-    // Function to validate the time input
+    /**
+     * Performs time validation for time input
+     * @param hours 
+     * @param minutes 
+     * @returns 
+     */
     const validateTime = (hours, minutes) => {
         try {
             const hoursNum = parseInt(hours, 10);
@@ -285,17 +409,30 @@ const AddAvailability = () => {
                 return false;
             }
             return true;
-        } catch (error) {
-            console.error('An error occurred  ',error);
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
+    /**
+     * List data to populate timeOfDay drop down picker
+     */
     const [timeOfDay, setTimeOfDay] = useState([
         {label: 'Select', value: '0'},
         {label: 'AM', value: '1'},
         {label: 'PM', value: '2'},
     ]);
 
+    /**
+     * List data to populate month drop down picker
+     */
     const [items, setItems] = useState([
         { label: 'Select', value: '0' },
         { label: 'January', value: '1' },
@@ -312,6 +449,9 @@ const AddAvailability = () => {
         { label: 'December', value: '12' },
     ]);
 
+    /**
+     * Enables button if all ciriteria for creating new availability have been met
+     */
     const enableButton = () => {
         try {
             let isAmInt = parseInt(isAm, 10);
@@ -320,9 +460,16 @@ const AddAvailability = () => {
             }else {
                 setIsDisabled(false);
             }
-        } catch (error) {
-            console.error('An error occurred  ',error);
-        }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        } 
     };
 
     return(
@@ -559,6 +706,10 @@ const styles = StyleSheet.create({
         width: 80,
         fontSize: 25,
         textAlign: 'center',
+    },
+    loader: {
+        // Add any specific styles you want for the loader
+        margin: 10,
     },
 });
 

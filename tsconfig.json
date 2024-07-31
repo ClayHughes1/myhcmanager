@@ -9,7 +9,7 @@
     "checkJs": true,  // Check JavaScript files for errors
     "strict": true,  // Enable all strict type-checking options
     "noImplicitAny": true,  // Raise error on expressions and declarations with an implied 'any' type
-    "moduleResolution": "node",  // Ensure modules are resolved correctly
+    "moduleResolution": "bundler",  // Ensure modules are resolved correctly
     "esModuleInterop": true,  // Ensures compatibility with CommonJS modules
     "skipLibCheck": true,  // Skip type checking of declaration files
     "forceConsistentCasingInFileNames": true  // Ensure file imports are case-sensitive

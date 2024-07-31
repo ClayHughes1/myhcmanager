@@ -109,13 +109,6 @@ const ViewAppointments = () => {
      */
     const handleChange = async () => {
         try {
-
-            // if(monthOp < 10)
-            // {
-            //     monthOp = '0' + monthOp;
-            // }
-
-            // let formattedMonthOp = monthOp;
             setFormattedMonthOp(monthOp);
             if (formattedMonthOp && parseInt(formattedMonthOp, 10) < 10) {
                 formattedMonthOp = '0' + formattedMonthOp;

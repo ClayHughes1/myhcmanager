@@ -27,9 +27,6 @@ function HomeScreen() {
           <TouchableOpacity style={styles.touchStyle} onPress={() => navigation.navigate('MeetingScheduler')}>
             <Text style={styles.buttons}>Meet</Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity style={styles.touchStyle} onPress={() => navigation.navigate('Cancel')}>
-            <Text style={styles.buttons}>Cancel</Text>
-          </TouchableOpacity> */}
         </View>
       </View>
     </ImageBackground>
