@@ -11,12 +11,14 @@ import {
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {AdminAppData} from '../../src/types/interfaces';
+import ApiErrorLogger from '../../classlibrary/ApiErrorLog.ts';
+
+const errorLogger = new ApiErrorLogger();
 
 const ViewAppointments = () => {
     const [meetings, setMeetings] = useState({});
     let [monthOp, setMonthOp] = useState<string>('');
     const [open, setOpen] = useState(false);
-    // const [markedDates, setMarkedDates] = useState({});
     const [dateData, setDateData] = useState<AdminAppData[]>([]);
     const [selectedDate, setSelectedDate] = useState('2024-05-01');
     let [formattedMonthOp,setFormattedMonthOp] = useState<string>();
@@ -50,16 +52,18 @@ const ViewAppointments = () => {
 
                 setDateData(response);
             }
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
-                console.error(err.message);
-                setError(err);
-                Alert.alert('Error', err.message);
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
+              Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
-            }
-        }
+            }      
+        } 
     };
 
     /**
@@ -92,16 +96,18 @@ const ViewAppointments = () => {
                     console.error('Error   ',err);
                 });
             }
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
-                console.error(err.message);
-                setError(err);
-                Alert.alert('Error', err.message);
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
+              Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
-            }
-        }
+            }      
+        } 
     };
 
     /**
@@ -118,16 +124,18 @@ const ViewAppointments = () => {
             const newDate = `${currentYear}-${formattedMonthOp}-01`;
             setSelectedDate(newDate);
             fetchMeetings();
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
-                console.error(err.message);
-                setError(err);
-                Alert.alert('Error', err.message);
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
+              Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
-            }
-        }
+            }      
+        } 
     };
 
     /**
@@ -154,16 +162,18 @@ const ViewAppointments = () => {
             const standardTime = `${hour}:${minutes} ${period}`;
 
             return standardTime;
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
-                console.error(err.message);
-                setError(err);
-                Alert.alert('Error', err.message);
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
+              Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
-            }
-        }
+            }      
+        } 
     };
 
     /**
@@ -192,16 +202,18 @@ const ViewAppointments = () => {
     const cancelMeeting = async(meetId: number) => {
         try {
             cancelMeetingOps(meetId);
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
-                console.error(err.message);
-                setError(err);
-                Alert.alert('Error', err.message);
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
+              Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
-            }
-        }
+            }      
+        } 
     };
 
     return(

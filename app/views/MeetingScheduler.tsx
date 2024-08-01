@@ -11,6 +11,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {ParamListBase, useNavigation} from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import ApiErrorLogger from '../../classlibrary/ApiErrorLog.ts';
+
+const errorLogger = new ApiErrorLogger();
 
 
 const SchedulerScreen = () => {
@@ -46,14 +49,17 @@ const SchedulerScreen = () => {
             })
             .catch((err) => {
                 console.error('Error   ',err);
+                errorLogger.handleError(err as Error);
             });
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
         } 
@@ -75,12 +81,14 @@ const SchedulerScreen = () => {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
-            }  
-        }
+            }      
+        } 
     };
 
     /**
@@ -100,9 +108,11 @@ const SchedulerScreen = () => {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
         } 
@@ -114,16 +124,18 @@ const SchedulerScreen = () => {
     const showDatepicker = () => {
         try {
             showMode('date');
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
-            }  
-        }
+            }      
+        } 
     };
 
     /**
@@ -132,16 +144,18 @@ const SchedulerScreen = () => {
     const showTimepicker = () => {
         try {
             showMode('time');
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
-            }  
-        }
+            }      
+        } 
     };
 
     /**
@@ -155,16 +169,18 @@ const SchedulerScreen = () => {
             } else {
               setEmailError('');
             }
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
-            }  
-        }
+            }      
+        } 
     };
 
     /**
@@ -174,16 +190,18 @@ const SchedulerScreen = () => {
     const handleEmailChange = (email: string) => {
         try {
             setUserEmail(email);
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
-            }  
-        }
+            }      
+        } 
     };
 
     /**
@@ -193,16 +211,18 @@ const SchedulerScreen = () => {
         try {
             validateEmail();
             isValidClient();
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
-            }  
-        }
+            }      
+        } 
     };
 
     /**
@@ -216,16 +236,18 @@ const SchedulerScreen = () => {
             else {
                 Alert.alert('Email is required. ');
             }
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
-            }  
-        }
+            }      
+        } 
     };
 
     /**
@@ -239,16 +261,18 @@ const SchedulerScreen = () => {
             else {
                 Alert.alert('Email is required. ');
             }
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
-            }  
-        }
+            }      
+        } 
     };
 
     return (

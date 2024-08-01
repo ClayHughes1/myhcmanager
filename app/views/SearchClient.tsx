@@ -8,6 +8,9 @@ import {
 } from 'react-native';
 import {ParamListBase, useNavigation} from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import ApiErrorLogger from '../../classlibrary/ApiErrorLog.ts';
+
+const errorLogger = new ApiErrorLogger();
 
 
 const  SearchScreen = () => {

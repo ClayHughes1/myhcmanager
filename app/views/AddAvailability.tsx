@@ -14,8 +14,11 @@ import {
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import DropDownPicker from 'react-native-dropdown-picker';
-import {Item} from '../../src/types/interfaces';
+import {Item, ErrorDetails} from '../../src/types/interfaces';
+import DeviceInfo from 'react-native-device-info';
+import ApiErrorLogger from '../../classlibrary/ApiErrorLog.ts';
 
+const errorLogger = new ApiErrorLogger();
 
 const AddAvailability = () => {
     let [monthOp, setMonthOp] = useState<any>(null);
@@ -32,6 +35,47 @@ const AddAvailability = () => {
     const [dayDate, setDayDate] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
+
+    // const logError = async (errorDetails: ErrorDetails) => {
+    //     try {
+    //       await fetch('http://10.0.2.2:4000/api/logError', {
+    //         method: 'POST',
+    //         headers: {
+    //           'Content-Type': 'application/json',
+    //         },
+    //         body: JSON.stringify(errorDetails),
+    //       });
+    //     } catch (error) {
+    //       console.error('Failed to log error:', error);
+    //       errorLogger.handleError.handleError(error as Error);
+    //     }
+    // };
+    
+    // const getDeviceInfo = () => {
+    //     return {
+    //         deviceModel: DeviceInfo.getModel(),
+    //         deviceManufacturer: DeviceInfo.getManufacturerSync(),
+    //         deviceID: DeviceInfo.getUniqueId(),
+    //         // Add any other device info you need
+    //     };
+    // };
+    
+    // const errorLogger.handleError = (error: Error) => {
+    // const deviceInfo = getDeviceInfo();
+    
+    // const errorDetails: ErrorDetails = {
+    //     userID: 'user123', // Replace with actual user ID if available
+    //     errorMessage: error.message,
+    //     stackTrace: error.stack,
+    //     deviceInfo: JSON.stringify(deviceInfo),
+    //     appVersion: '1.0.0', // Replace with actual app version
+    //     osVersion: '14.0', // Replace with actual OS version
+    //     additionalContext: 'Any additional context', // Optional additional context
+    // };
+    
+    // logError(errorDetails);
+    // Alert.alert('An error occurred', error.message);
+    // };
 
     /**
      * Extract coach availability from db using fetch framework
@@ -70,9 +114,11 @@ const AddAvailability = () => {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
         } 
@@ -104,13 +150,15 @@ const AddAvailability = () => {
             .catch((err) => {
                 console.error('Error   ',err);
             });
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
         } 
@@ -148,12 +196,14 @@ const AddAvailability = () => {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
     /**
@@ -186,16 +236,18 @@ const AddAvailability = () => {
             .catch((err) => {
                 console.error('Error   ',err);
             });
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
     /**
@@ -214,16 +266,18 @@ const AddAvailability = () => {
             setSelectedDate(newDate);
             setDateData([]);
             fetchAvailability();
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
     /**
@@ -241,16 +295,18 @@ const AddAvailability = () => {
             }
 
             fetchAvailabilityByDate(day.dateString);
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
     /**
@@ -282,12 +338,14 @@ const AddAvailability = () => {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
     /**
@@ -296,16 +354,18 @@ const AddAvailability = () => {
     const clearList = () => {
         try {
             setDateData([]);
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
     /**
@@ -315,16 +375,18 @@ const AddAvailability = () => {
     const removeDate = (dateId) => {
         try {
             removeDateOps(dateId);
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
     /**
@@ -341,16 +403,18 @@ const AddAvailability = () => {
             }else {
                 setIsVisible(!isVisible);
             }
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
     /**
@@ -378,16 +442,18 @@ const AddAvailability = () => {
             } else {
                 Alert.alert('Invalid Time', 'Please enter a valid time.');
             }
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
     /**
@@ -409,16 +475,18 @@ const AddAvailability = () => {
                 return false;
             }
             return true;
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
     /**
@@ -460,16 +528,18 @@ const AddAvailability = () => {
             }else {
                 setIsDisabled(false);
             }
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
     return(

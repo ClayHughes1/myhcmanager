@@ -11,6 +11,9 @@ import {
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {MyAppData} from '../../src/types/interfaces';
+import ApiErrorLogger from '../../classlibrary/ApiErrorLog.ts';
+
+const errorLogger = new ApiErrorLogger();
 
 const MyAppointments = ({route}) => {
     const { email } = route.params;
@@ -45,18 +48,21 @@ const MyAppointments = ({route}) => {
                 })
                 .catch((err) => {
                     console.error('Error   ',err);
+                    errorLogger.handleError(err as Error);
                 });
             }
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
-            } 
-        }
+            }      
+        } 
     };
 
     useEffect(() => {
@@ -89,16 +95,18 @@ const MyAppointments = ({route}) => {
 
             return standardTime;
 
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
-            } 
-        }
+            }      
+        } 
     };
 
     /**
@@ -121,16 +129,18 @@ const MyAppointments = ({route}) => {
                     setAppData(filtered);
                 }
             }
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
-                console.error(err.message);
-                setError(err);
-                Alert.alert('Error', err.message);
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
+              Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
-            }
-        }
+            }      
+        } 
     };
 
     /**

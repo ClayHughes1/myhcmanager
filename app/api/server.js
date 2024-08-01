@@ -5,6 +5,8 @@ const dbOps    = require('./dbOps');
 const path = require('path');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const apierrorlog = require('../classlibrary/apierrorlog.ts');
+const errorLogger = new apierrorlog();
 
 app.use(express.static(path.join(__dirname,'/')));
 app.use(bodyParser.json()); // Use body-parser to parse JSON bodies
@@ -19,12 +21,14 @@ app.get('/api/data', (req, res) => {
             } else {
                 res.status(401).json({ success: false, message: 'Invalid email or password' });
             }
-        }).catch((error) => {
-            console.error('Error', error);
+        }).catch((err) => {
+            errorLogger.handleError(err);
+            console.err('err', err);
         });
     } catch (err) {
-        console.error('SQL error', err);
-        res.status(500).json({ success: false, message: 'Server error' });
+        errorLogger.handleError(err);
+        console.err('SQL err', err);
+        res.status(500).json({ success: false, message: 'Server err' });
     }
 });
 
@@ -38,12 +42,14 @@ app.post('/api/login', async (req, res) => {
             } else {
                 res.status(401).json({ success: false, message: 'Invalid email or password' });
             }
-        }).catch((error) => {
-            console.error('Error', error);
+        }).catch((err) => {
+            errorLogger.handleError(err);
+            console.err('err', err);
         });
     } catch (err) {
-        console.error('SQL error', err);
-        res.status(500).json({ success: false, message: 'Server error' });
+        errorLogger.handleError(err);
+        console.err('SQL err', err);
+        res.status(500).json({ success: false, message: 'Server err' });
     }
 });
 
@@ -62,12 +68,14 @@ app.post('/api/addclient', async (req, res) => {
                         res.status(401).json({ success: false, message: 'Something happened the client was not created. ' });
                     }
                 }).catch((err) => {
-                    console.error('Error', err);
+                    errorLogger.handleError(err);
+                    console.err('err', err);
                 });
             }
     } catch (err) {
-        console.error('SQL error', err);
-        res.status(500).json({ success: false, message: 'Server error' });
+        errorLogger.handleError(err);
+        console.err('SQL err', err);
+        res.status(500).json({ success: false, message: 'Server err' });
     }
 });
 
@@ -77,20 +85,22 @@ app.post('/api/addclientmeetevent', async (req, res) => {
         if (!userEmail || !date || !time || !userDesc) {
             return res.status(400).json({ success: false, message: 'Missing required fields' });
         }
-        // else {
-        //         dbOps.insertClientMeetDate(userEmail, date, time, userDesc).then((result) => {
-        //             if (result > -1) {
-        //                 res.status(200).json({ success: true, message: 'Client event entered successfully', eventId: result});
-        //             } else {
-        //                 res.status(401).json({ success: false, message: 'Something happened the event was not created. ' });
-        //             }
-        //         }).catch((err) => {
-        //             console.error('Error', err);
-        //         });
-        //     }
+        else {
+            dbOps.insertClientMeetDate(userEmail, date, time, userDesc).then((result) => {
+                if (result > -1) {
+                    res.status(200).json({ success: true, message: 'Client event entered successfully', eventId: result});
+                } else {
+                    res.status(401).json({ success: false, message: 'Something happened the event was not created. ' });
+                }
+            }).catch((err) => {
+                errorLogger.handleError(err);
+                console.err('err', err);
+            });
+        }
     } catch (err) {
-        console.error('SQL error', err);
-        res.status(500).json({ success: false, message: 'Server error' });
+        errorLogger.handleError(err);
+        console.err('SQL err', err);
+        res.status(500).json({ success: false, message: 'Server err' });
     }
 });
 
@@ -111,12 +121,14 @@ app.post('/api/addclientmeeteventdate', async (req, res) => {
                     res.status(401).json({ success: false, message: 'Something happened the event was not created. ' });
                 }
             }).catch((err) => {
-                console.error('Error', err);
+                errorLogger.handleError(err);
+                console.err('err', err);
             });
         }
     } catch (err) {
-        console.error('SQL error', err);
-        res.status(500).json({ success: false, message: 'Server error' });
+        errorLogger.handleError(err);
+        console.err('SQL err', err);
+        res.status(500).json({ success: false, message: 'Server err' });
     }
 });
 
@@ -133,12 +145,14 @@ app.post('/api/getclientdetail', async (req, res) => {
                     res.status(401).json({ success: false, message: 'Something happened the client was not found. ' });
                 }
             }).catch((err) => {
-                console.error('Error', err);
+                errorLogger.handleError(err);
+                console.err('err', err);
             });
         }
-    } catch (error) {
-        console.error('SQL error', err);
-        res.status(500).json({ success: false, message: 'Server error' });
+    } catch (err) {
+        errorLogger.handleError(err);
+        console.err('SQL err', err);
+        res.status(500).json({ success: false, message: 'Server err' });
     }
 
 });
@@ -150,19 +164,21 @@ app.post('/api/updateclientdetail', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Missing required fields' });
         }
         else {
-                dbOps.updateClientDetail(ClientId,email,planStart,planEnd,hasOrder).then((result) => {
-                    if (result > 0) {
-                        res.status(200).json({ success: true, message: 'Client updated successfully',});
-                    } else {
-                        res.status(401).json({ success: false, message: 'Something happened the client was not created. ' });
-                    }
-                }).catch((err) => {
-                    console.error('Error', err);
-                });
-            }
+            dbOps.updateClientDetail(ClientId,email,planStart,planEnd,hasOrder).then((result) => {
+                if (result > 0) {
+                    res.status(200).json({ success: true, message: 'Client updated successfully',});
+                } else {
+                    res.status(401).json({ success: false, message: 'Something happened the client was not created. ' });
+                }
+            }).catch((err) => {
+                errorLogger.handleError(err);
+                console.err('err', err);
+            });
+        }
     } catch (err) {
-        console.error('SQL error', err);
-        res.status(500).json({ success: false, message: 'Server error' });
+        errorLogger.handleError(err);
+        console.err('SQL err', err);
+        res.status(500).json({ success: false, message: 'Server err' });
     }
 });
 
@@ -180,12 +196,14 @@ app.post('/api/getscheduledata', async (req, res) => {
                     res.status(401).json({ success: false, message: 'Something happened the client was not found. ' });
                 }
             }).catch((err) => {
-                console.error('Error', err);
+                errorLogger.handleError(err);
+                console.err('err', err);
             });
         }
-    } catch (error) {
-        console.error('SQL error', error);
-        res.status(500).json({ success: false, message: 'Server error' });
+    } catch (err) {
+        errorLogger.handleError(err);
+        console.err('SQL err', err);
+        res.status(500).json({ success: false, message: 'Server err' });
     }
 
 });
@@ -203,16 +221,17 @@ app.post('/api/getmyappts', async (req, res) => {
                     res.status(401).json({ success: false, message: 'Something happened the client was not found. ' });
                 }
             }).catch((err) => {
-                console.log('Error', err);
+                errorLogger.handleError(err);
+                console.log('err', err);
             });
         }
-    } catch (error) {
-        console.log('SQL error', error);
-        res.status(500).json({ success: false, message: 'Server error' });
+    } catch (err) {
+        errorLogger.handleError(err);
+        console.log('SQL err', err);
+        res.status(500).json({ success: false, message: 'Server err' });
     }
 
 });
-
 
 app.post('/api/getavailabilitybymonth', async (req, res) => {
     const {monthOp} = req.body;
@@ -227,12 +246,14 @@ app.post('/api/getavailabilitybymonth', async (req, res) => {
                     res.status(401).json({ success: false, message: 'Something happened the client was not found. ' });
                 }
             }).catch((err) => {
-                console.error('Error', err);
+                errorLogger.handleError(err);
+                console.err('err', err);
             });
         }
-    } catch (error) {
-        console.error('SQL error', error);
-        res.status(500).json({ success: false, message: 'Server error' });
+    } catch (err) {
+        errorLogger.handleError(err);
+        console.err('SQL err', err);
+        res.status(500).json({ success: false, message: 'Server err' });
     }
 });
 
@@ -246,11 +267,13 @@ app.post('/api/getavailability', async (req, res) => {
                 res.status(401).json({ success: false, message: 'Something happened the client was not found. ' });
             }
         }).catch((err) => {
-            console.error('Error', err);
+            errorLogger.handleError(err);
+            console.err('err', err);
         });
-    } catch (error) {
-        console.error('SQL error', error);
-        res.status(500).json({ success: false, message: 'Server error' });
+    } catch (err) {
+        errorLogger.handleError(err);
+        console.err('SQL err', err);
+        res.status(500).json({ success: false, message: 'Server err' });
     }
 });
 
@@ -267,12 +290,14 @@ app.post('/api/getavailabilitybydate', async (req, res) => {
                     res.status(401).json({ success: false, message: 'Something happened the client was not found. ' });
                 }
             }).catch((err) => {
-                console.error('Error', err);
+                errorLogger.handleError(err);
+                console.err('err', err);
             });
         }
-    } catch (error) {
-        console.error('SQL error', error);
-        res.status(500).json({ success: false, message: 'Server error' });
+    } catch (err) {
+        errorLogger.handleError(err);
+        console.err('SQL err', err);
+        res.status(500).json({ success: false, message: 'Server err' });
     }
 });
 
@@ -294,12 +319,14 @@ app.post('/api/isvalidclientemail', async (req, res) => {
                     res.status(401).json({ success: false, message: 'Something happened the client was not found. Check the email and try again.' });
                 }
             }).catch((err) => {
-                console.error('Error', err);
+                errorLogger.handleError(err);
+                console.err('err', err);
             });
         }
-    } catch (error) {
-        console.error('SQL error', error);
-        res.status(500).json({ success: false, message: 'Server error' });
+    } catch (err) {
+        errorLogger.handleError(err);
+        console.err('SQL err', err);
+        res.status(500).json({ success: false, message: 'Server err' });
     }
 });
 
@@ -316,12 +343,14 @@ app.post('/api/deleteavailability', async (req, res) => {
                     res.status(401).json({ success: false, message: 'Something happened the date was not removed. ' });
                 }
             }).catch((err) => {
-                console.error('Error', err);
+                errorLogger.handleError(err);
+                console.err('err', err);
             });
         }
-    } catch (error) {
-        console.error('SQL error', error);
-        res.status(500).json({ success: false, message: 'Server error' });
+    } catch (err) {
+        errorLogger.handleError(err);
+        console.err('SQL err', err);
+        res.status(500).json({ success: false, message: 'Server err' });
     }
 });
 
@@ -338,12 +367,14 @@ app.post('/api/deletemeeting', async (req, res) => {
                     res.status(401).json({ success: false, message: 'Something happened the date was not removed. ' });
                 }
             }).catch((err) => {
-                console.error('Error', err);
+                errorLogger.handleError(err);
+                console.err('err', err);
             });
         }
-    } catch (error) {
-        console.error('SQL error', error);
-        res.status(500).json({ success: false, message: 'Server error' });
+    } catch (err) {
+        errorLogger.handleError(err);
+        console.err('SQL err', err);
+        res.status(500).json({ success: false, message: 'Server err' });
     }
 });
 
@@ -360,14 +391,17 @@ app.post('/api/addavailability', async (req, res) => {
                     res.status(401).json({ success: false, message: 'Something happened the date was not removed. ' });
                 }
             }).catch((err) => {
-                console.error('Error', err);
+                errorLogger.handleError(err);
+                console.err('err', err);
             });
         }
-    } catch (error) {
-        console.error('SQL error', error);
-        res.status(500).json({ success: false, message: 'Server error' });
+    } catch (err) {
+        errorLogger.handleError(err);
+        console.err('SQL err', err);
+        res.status(500).json({ success: false, message: 'Server err' });
     }
 });
+
 
 const isValidEmail = async(email) => {
     var emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;

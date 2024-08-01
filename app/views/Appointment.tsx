@@ -16,6 +16,10 @@ import RNCalendarEvents, { AuthorizationStatus } from 'react-native-calendar-eve
 import { RouteProp } from '@react-navigation/native';
 import {ResponseItem, MarkedDate} from '../../src/types/interfaces';
 
+import ApiErrorLogger from '../../classlibrary/ApiErrorLog.ts';
+
+const errorLogger = new ApiErrorLogger();
+
 // Define the PermissionStatus type
 type PermissionStatus = 'authorized' | 'granted' | 'denied' | 'restricted' | 'undetermined' | 'prompt';
 
@@ -66,8 +70,17 @@ const AppointmentScreen = ({route}) => {
             }, {});
             setMarkedDates(marked);
           }
-        } catch (error) {
-          console.error('Error fetching availability', error);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
         }
     }, []);
     
@@ -90,8 +103,17 @@ const AppointmentScreen = ({route}) => {
               }
             }
     
-        }  catch (error) {
-            console.error('An error occurred  ',error);
+        }catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
         }
     }, [status]);
     
@@ -99,8 +121,17 @@ const AppointmentScreen = ({route}) => {
         try {
             fetchAvailability();
             requestPermissions();
-        } catch (error) {
-            console.error('An error occurred  ',error);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
         }
 
     }, [email, fetchAvailability, requestPermissions]);
@@ -123,8 +154,17 @@ const AppointmentScreen = ({route}) => {
           } else {
             Alert.alert('No records were found for this date.');
           }
-        } catch (error) {
-          console.error('Error fetching availability by date', error);
+        }catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
         }
     };
 
@@ -170,12 +210,14 @@ const AppointmentScreen = ({route}) => {
                 if (err instanceof Error) {
                   console.error(err.message);
                   setError(err);  // Assign the error to the state
+                  errorLogger.handleError(err as Error);
                   Alert.alert('Error', err.message);
                 } else {
                     console.error('Unexpected error', err);
+                    errorLogger.handleError(err as Error);
                     Alert.alert('Error', 'An unexpected error occurred.');
                 }      
-            } 
+            }
         }
     };
 
@@ -218,12 +260,14 @@ const AppointmentScreen = ({route}) => {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
     /**
@@ -256,12 +300,14 @@ const AppointmentScreen = ({route}) => {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
     /**
@@ -286,12 +332,14 @@ const AppointmentScreen = ({route}) => {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
     /**
@@ -302,13 +350,15 @@ const AppointmentScreen = ({route}) => {
         try {
             setDateData([]);
             setShowCalander(true);
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
         } 
@@ -321,16 +371,18 @@ const AppointmentScreen = ({route}) => {
     const handleChangeValue = (value: any) => {
         try {
             setAppTypeValue(value);
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
     /**
@@ -339,16 +391,18 @@ const AppointmentScreen = ({route}) => {
     const goHome = () => {
         try {
             navigation.navigate('Home');
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
     /**
@@ -377,16 +431,18 @@ const AppointmentScreen = ({route}) => {
             } else {
                 Alert.alert('Permission denied', 'Calendar permission is required to add an event.');
             }
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
 

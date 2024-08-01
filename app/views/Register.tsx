@@ -9,6 +9,9 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import ApiErrorLogger from '../../classlibrary/ApiErrorLog.ts';
+
+const errorLogger = new ApiErrorLogger();
 
 
 const RegisterScreen = () => {
@@ -25,13 +28,15 @@ const RegisterScreen = () => {
         try {
             Alert.alert('Login cancelled');
             navigation.navigate('Home');
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
         } 
@@ -44,13 +49,15 @@ const RegisterScreen = () => {
     const createAccount = ()=>{
         try {
             navigation.navigate('Register');
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
         } 

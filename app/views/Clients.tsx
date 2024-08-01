@@ -12,6 +12,9 @@ import {
 import {ParamListBase, useNavigation} from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {Client} from '../../src/types/interfaces';
+import ApiErrorLogger from '../../classlibrary/ApiErrorLog.ts';
+
+const errorLogger = new ApiErrorLogger();
 
 const ClientResultsScreen = () => {
     const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
@@ -31,6 +34,7 @@ const ClientResultsScreen = () => {
             })
             .catch((error) => {
                 console.error(error);
+                errorLogger.handleError(err as Error);
                 setLoading(false);
             });
     }, []);

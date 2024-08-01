@@ -44,3 +44,12 @@ export interface Item {
     Time: string;
     Id: number | string; // Choose the appropriate type for your Id
 }
+export interface ErrorDetails {
+    userID: string; // User ID (optional)
+    errorMessage: string; // Error message
+    stackTrace?: string; // Stack trace of the error
+    deviceInfo: string; // Device information
+    appVersion: string; // Application version
+    osVersion: string; // Operating system version
+    additionalContext?: string; // Optional additional context
+}

@@ -15,6 +15,9 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { isValid } from 'date-fns';
 import {ResponseItem, MarkedDate} from '../../src/types/interfaces';
+import ApiErrorLogger from '../../classlibrary/ApiErrorLog.ts';
+
+const errorLogger = new ApiErrorLogger();
 
 /**
  * Add client window
@@ -67,17 +70,20 @@ const AddClient = () =>{
                 })
                 .catch((err) => {
                     console.error('Error   ',err);
+                    errorLogger.handleError(err as Error);
                 });
-            } catch (err: unknown) {
-                if (err instanceof Error) {
-                  console.error(err.message);
-                  setError(err);  // Assign the error to the state
-                  Alert.alert('Error', err.message);
-                } else {
-                    console.error('Unexpected error', err);
-                    Alert.alert('Error', 'An unexpected error occurred.');
-                }      
-            } 
+            }catch (err: unknown) {
+            if (err instanceof Error) {
+              console.error(err.message);
+              setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
+              Alert.alert('Error', err.message);
+            } else {
+                console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
+                Alert.alert('Error', 'An unexpected error occurred.');
+            }      
+        }
         }
     };
     /**
@@ -95,13 +101,15 @@ const AddClient = () =>{
     const addMeetingDate = async() => {
         try {
             navigation.navigate('MeetingScheduler',{email, firstName, lastName,})
-        } catch (err: unknown) {
+        }  catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
         } 
@@ -117,12 +125,14 @@ const AddClient = () =>{
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
     /**
@@ -135,12 +145,14 @@ const AddClient = () =>{
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
     /**
@@ -162,12 +174,14 @@ const AddClient = () =>{
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
     /**
@@ -186,12 +200,14 @@ const AddClient = () =>{
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
     /**
@@ -208,16 +224,18 @@ const AddClient = () =>{
             else {
                 Alert.alert('Please select a valid option. ');
             }
-        } catch (err: unknown) {
+        }catch (err: unknown) {
             if (err instanceof Error) {
               console.error(err.message);
               setError(err);  // Assign the error to the state
+              errorLogger.handleError(err as Error);
               Alert.alert('Error', err.message);
             } else {
                 console.error('Unexpected error', err);
+                errorLogger.handleError(err as Error);
                 Alert.alert('Error', 'An unexpected error occurred.');
             }      
-        } 
+        }
     };
 
     /**
